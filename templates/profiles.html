@@ -1,10 +1,28 @@
-{% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-    <h2>User Profile</h2>
-    <div>
-        <img src="{{ user.profile.avatar.url }}" alt="{{ user.profile.full_name }}">
-        <h3>{{ user.profile.full_name }}</h3>
-        <p>{{ user.profile.bio }}</p>
+{% include 'alerts.html' %}
+<style>
+    .profile-card {
+        max-height: 100vh;
+        /* Adjust as needed */
+    }
+</style>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card profile-card">
+                <div class="card-body text-center">
+                    <img class="rounded-circle mb-3"
+                        src="{% if profile.avatar.url %}{{ profile.avatar.url }}{% else %}{% static 'images/suman.png' %}{% endif %}"
+                        alt="{{ profile.full_name }}" width="150" height="150">
+                    <h3 class="card-title">{{ profile.full_name }}</h3>
+                    <p class="card-text">{{ profile.bio }}</p>
+                    <a href="{% url 'update_profile' %}" class="btn btn-primary">
+                        <i class="fas fa-user-edit"></i> Update Profile
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock %}
