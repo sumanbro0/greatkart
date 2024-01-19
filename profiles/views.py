@@ -64,7 +64,7 @@ def logout_view(request):
     return redirect('home')
 
 
-
+@login_required
 def update_profile(request):
     if request.method == 'POST':
         profile = Profile.objects.get(user=request.user)
@@ -76,6 +76,7 @@ def update_profile(request):
         profile.save()
         profile_html = render_to_string('profiles.html', {'profile': profile}, request=request)
         return HttpResponse(profile_html)
+    return redirect('me')
     
 
 @login_required
