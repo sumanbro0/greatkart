@@ -82,6 +82,7 @@
 						<form action="{% url 'home' %}" class="search" hx-get="{% url 'home' %}" hx-post="{% url 'home' %}" hx-target="body" hx-swap="outerHTML">
 							<div class="position-relative" style="overflow: visible;">
 								<div class="input-group mb-0">
+									<!-- search query from context processors -->
 									<input type="text" class="form-control" placeholder="Search" name="query" value="{{ search_query }}" hx-get="{% url 'search' %}" hx-trigger="keyup delay:500ms" hx-indicator="#loading-indicator" hx-target="#search-suggestions" autocomplete="off" hx-swap="innerHTML"/>
 									<div class="input-group-append">
 										<button class="btn btn-primary" type="submit">
