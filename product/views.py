@@ -3,13 +3,23 @@ from django.shortcuts import render
 from .models import Category, Product, Size
 from django.db.models import Avg
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 
 # Create your views here.
 def index(request):
-    popular_products = Product.objects.prefetch_related("images").annotate(average_rating=Avg('reviews__rating')).order_by('-average_rating')[:5]
-    return render(request, 'index.html',{"products":popular_products})
+    products = Product.objects.prefetch_related("images").annotate(average_rating=Avg('reviews__rating')).order_by('-average_rating')[:5]
+    query = request.GET.get('query')
+    if query:
+        products_list = Product.objects.prefetch_related("images").filter(Q(name__icontains=query) | Q(desc__icontains=query))
+        return render(request, 'index.html',{"products":products_list, "query":query})
 
+    return render(request, 'index.html',{"products":products})
+
+def search_suggestions(request):
+    query = request.GET.get('query', '')
+    items = Product.objects.filter(Q(name__icontains=query) | Q(desc__icontains=query))[:5]
+    return render(request, 'search_suggestions.html', {'items': items})
 
 def frange(start, stop, step):
     i = start
@@ -22,7 +32,7 @@ def store(request):
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     size_ids = request.GET.getlist('size')
-
+    
     products_list = Product.objects.all()
 
     if category_ids:
@@ -34,6 +44,7 @@ def store(request):
     if size_ids:
         products_list = products_list.filter(variants__sizes__id__in=size_ids)
 
+    
     product_ids = products_list.values_list('id', flat=True).distinct()
 
     products_list = Product.objects.filter(id__in=product_ids)
@@ -52,7 +63,7 @@ def store(request):
 
     query_params.pop('page', None)
 
-    base_query_string = urlencode(query_params)
+    base_query_string = query_params.urlencode()
 
     context = {
         'products': products,
@@ -65,3 +76,5 @@ def store(request):
     if request.htmx:
         return render(request, 'products_list.html', context)
     return render(request, 'store.html', context)
+
+

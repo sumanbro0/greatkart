@@ -4,6 +4,7 @@
 {% block content %}
 
 <!-- ========================= SECTION MAIN ========================= -->
+{% if not query %}
 <section class="section-intro padding-y-sm">
 	<div class="container">
 
@@ -13,17 +14,23 @@
 
 	</div> <!-- container //  -->
 </section>
+{% endif %}
 <!-- ========================= SECTION MAIN END// ========================= -->
 
 <!-- ========================= SECTION  ========================= -->
 <section class="section-name padding-y-sm">
 	<div class="container">
-
+		{% if query %}
+		<header class="section-heading">
+			<a href="{% url 'store' %}" class="btn btn-outline-primary float-right">See all products</a>
+			<h3 class="section-title">search result for {{ query }}</h3>
+		</header><!-- sect-heading -->
+		{% else %}
 		<header class="section-heading">
 			<a href="{% url 'store' %}" class="btn btn-outline-primary float-right">See all</a>
 			<h3 class="section-title">Popular products</h3>
 		</header><!-- sect-heading -->
-
+		{% endif %}
 
 		<div class="row">
 			{% for product in products %}

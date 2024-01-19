@@ -1,0 +1,29 @@
+<ul class="list-group position-absolute w-100" id="suggestion-list" style="z-index: 1000;">
+{% for item in items %}
+    <li class="list-group-item"><a href="#" class="suggestion">{{ item.name }}</a></li>
+{% endfor %}
+</ul>
+
+<script>
+    $(document).ready(function() {
+        var $input = $('input[name="query"]');
+        var selectedIndex = -1;
+
+        $input.on('keydown', function(e) {
+            var $listItems = $('#suggestion-list li');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % $listItems.length;
+                $input.val($($listItems[selectedIndex]).text());
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + $listItems.length) % $listItems.length;
+                $input.val($($listItems[selectedIndex]).text());
+            }
+
+            $listItems.removeClass('selected');
+            $($listItems[selectedIndex]).addClass('selected');
+        });
+    });
+</script>
