@@ -12,8 +12,6 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
-    
-    print(settings.BASE_DIR)
     return render(request, 'index.html')
 
 
@@ -104,3 +102,10 @@ def orders(request):
 @login_required
 def me(request):
     return render(request, 'dashboard.html')
+
+
+@login_required
+def add_address(request):
+    if request.method=="POST":
+        pass
+    return render(request, 'add_address.html')
