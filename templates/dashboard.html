@@ -3,11 +3,14 @@
 <style>
 	#content {
 		min-height: 80vh;
-		/* Adjust as needed */
 	}
 
 	.list-group-item a {
 		color: black;
+	}
+
+	.list-group-item a.active {
+		color: blue;
 	}
 </style>
 <div class="container">
@@ -16,7 +19,7 @@
 			<ul class="list-group">
 				<li class="list-group-item">
 					<a href="{% url 'profile' %}" hx-get="{% url 'profile' %}" hx-swap="innerHTML" hx-target="#content"
-						hx-boost="true" hx-replace-url="true" data-state="profile">
+						hx-trigger="click, load" hx-boost="true" hx-replace-url="true" data-state="profile">
 						<i class="fas fa-user"></i> My Profile
 					</a>
 				</li>
@@ -27,7 +30,13 @@
 					</a>
 				</li>
 				<li class="list-group-item">
-					<a href="{% url 'logout' %}">
+					<a href="{% url 'address' %}" hx-get="{% url 'address' %}" hx-swap="innerHTML" hx-target="#content"
+						hx-boost="true" data-state="address">
+						<i class="fas fa-shopping-cart"></i> Addresses
+					</a>
+				</li>
+				<li class="list-group-item">
+					<a href="{% url 'logout' %}" id="logout-link">
 						<i class="fas fa-sign-out-alt"></i> Logout
 					</a>
 				</li>
@@ -38,12 +47,29 @@
 		</main>
 	</div>
 </div>
+{% endblock content %}
+{% block script %}
 <script>
 	document.querySelectorAll('a[data-state]').forEach(function (link) {
 		link.addEventListener('click', function () {
+			// Remove the active class from all links
+			document.querySelectorAll('a[data-state]').forEach(function (link) {
+				link.classList.remove('active');
+			});
+
+			// Add the active class to the clicked link
+			this.classList.add('active');
+
 			sessionStorage.setItem('state', this.getAttribute('data-state'));
 		});
 	});
+
+	var logoutLink = document.getElementById('logout-link');
+	if (logoutLink) {
+		logoutLink.addEventListener('click', function () {
+			sessionStorage.clear();
+		});
+	}
 
 	window.addEventListener('DOMContentLoaded', (event) => {
 		var state = sessionStorage.getItem('state');
@@ -51,8 +77,23 @@
 			var link = document.querySelector(`a[data-state="${state}"]`);
 			if (link) {
 				link.click();
+				link.classList.add('active');
+			}
+		} else {
+			// Add the active class to the first link if no state is stored in the sessionStorage
+			var firstLink = document.querySelector('a[data-state]');
+			if (firstLink) {
+				firstLink.classList.add('active');
 			}
 		}
 	});
+
+	document.querySelectorAll('a').forEach(function (link) {
+		link.addEventListener('click', function () {
+			if (this.getAttribute('href') !== '/me') {
+				sessionStorage.clear();
+			}
+		});
+	});
 </script>
-{% endblock content %}
+{% endblock script %}

@@ -1,14 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-
-from core import settings
-from .forms import ProfileForm
-from .models import Profile
+from django.template.loader import render_to_string
+from .models import Address, Profile
 from django.contrib.auth.decorators import login_required
+from .forms import ProfileForm
 
 # Create your views here.
 def index(request):
@@ -63,27 +63,20 @@ def logout_view(request):
     messages.success(request, 'You have successfully logged out.')
     return redirect('home')
 
-@login_required
+
+
 def update_profile(request):
-
-    try:
-        profile = request.user.profile
-    except Profile.DoesNotExist:
-        profile = Profile(user=request.user)
-        profile.full_name=request.user.first_name + ' ' + request.user.last_name
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile has been updated.')
-            return redirect('me')
-        else:
-            print(form.errors.as_text())
-            messages.error(request, 'Please correct the error below.' + form.errors.as_text())
-    else:
-        form = ProfileForm(instance=profile)
-    return render(request, 'update_profile.html', {'form': form})
-
+        profile = Profile.objects.get(user=request.user)
+        avatar = request.FILES.get('avatar')
+        if avatar:
+            profile.avatar = avatar
+        profile.full_name = request.POST.get('full_name')
+        profile.bio = request.POST.get('bio')
+        profile.save()
+        profile_html = render_to_string('profiles.html', {'profile': profile}, request=request)
+        return HttpResponse(profile_html)
+    
 
 @login_required
 def my_profile(request):
@@ -103,9 +96,33 @@ def orders(request):
 def me(request):
     return render(request, 'dashboard.html')
 
-
 @login_required
 def add_address(request):
-    if request.method=="POST":
-        pass
-    return render(request, 'add_address.html')
+    addresses = Address.objects.filter(profile__user=request.user)
+    if request.method == "POST":
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
+        zip_code = request.POST.get('zip_code')
+        address,created=Address.objects.get_or_create(address=address, city=city, state=state, country=country, zip_code=zip_code, profile=request.user.profile)
+        if created:
+            messages.success(request, 'Address has been added.')
+        else:
+            messages.error(request, 'Address already exists.')
+    if request.htmx:
+        html = render_to_string('add_address.html', {'addresses': addresses}, request=request)
+        return HttpResponse(html)
+    return render(request, 'add_address.html', {'addresses': addresses})
+
+@login_required
+def delete_address(request, pk):
+    if pk:
+        address = Address.objects.get(id=pk)
+        address.delete()
+        messages.success(request, 'Address has been deleted.')
+    if request.htmx:
+        addresses = Address.objects.filter(profile__user=request.user)
+        html = render_to_string('add_address.html', {'addresses': addresses}, request=request)
+        return HttpResponse(html)
+    return redirect('address')
