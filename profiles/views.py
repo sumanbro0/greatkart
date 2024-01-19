@@ -74,8 +74,9 @@ def update_profile(request):
         profile.full_name = request.POST.get('full_name')
         profile.bio = request.POST.get('bio')
         profile.save()
-        profile_html = render_to_string('profiles.html', {'profile': profile}, request=request)
-        return HttpResponse(profile_html)
+        # profile_html = render_to_string('profiles.html', {'profile': profile}, request=request)
+        # return HttpResponse(profile_html)
+        return render(request, 'profiles.html', {'profile': profile})
     return redirect('me')
     
 
@@ -111,10 +112,8 @@ def add_address(request):
             messages.success(request, 'Address has been added.')
         else:
             messages.error(request, 'Address already exists.')
-    if request.htmx:
-        html = render_to_string('add_address.html', {'addresses': addresses}, request=request)
-        return HttpResponse(html)
     return render(request, 'add_address.html', {'addresses': addresses})
+
 
 @login_required
 def delete_address(request, pk):
@@ -122,8 +121,4 @@ def delete_address(request, pk):
         address = Address.objects.get(id=pk)
         address.delete()
         messages.success(request, 'Address has been deleted.')
-    if request.htmx:
-        addresses = Address.objects.filter(profile__user=request.user)
-        html = render_to_string('add_address.html', {'addresses': addresses}, request=request)
-        return HttpResponse(html)
     return redirect('address')

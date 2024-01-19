@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg
 
 
 class Category(models.Model):
@@ -87,24 +88,11 @@ class ProductImage(models.Model):
 
 
 
+
 class Review(models.Model):
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey('auth.User', related_name='reviews', on_delete=models.CASCADE)
     comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return self.product.name
-    
-
-
-class Rating(models.Model):
-    product = models.ForeignKey(Product, related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey('auth.User', related_name='ratings', on_delete=models.CASCADE)
     rating = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

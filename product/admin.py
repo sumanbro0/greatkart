@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from .models import Product, ProductImage, Color, Size, Category,ProductVariant,Rating,Review
+from .models import Product, ProductImage, Color, Size, Category,ProductVariant,Review
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -26,6 +26,5 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Color)
 admin.site.register(Size)
 admin.site.register(Category)
-admin.site.register(Rating)
 admin.site.register(Review)
 admin.site.site_header = 'Ecommerce Admin'

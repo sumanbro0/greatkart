@@ -1,0 +1,74 @@
+<main id="main" class="col-md-9">
+
+    <header class="border-bottom mb-4 pb-3">
+        <div class="form-inline">
+            <span class="mr-md-auto">{{ n }} Items found </span>
+        </div>
+    </header><!-- sect-heading -->
+
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4  ">
+            <div class="card card-product-grid">
+                {% if product.images.all %}
+                <a href="./product-detail.html" class="img-wrap">
+                    <img src="{{ product.images.all.0.image.url }}" class="card-img-top">
+                </a>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="#" class="title text-primary">{{ product.name }}</a>
+                    </h5>
+                    <hr class="my-4">
+                    <h6 class="card-subtitle mb-2 text-muted">Price</h6>
+                    <p class="card-text">${{ product.base_price }}</p>
+                    <a href="#" class="btn btn-primary mt-4 ">View Details</a>
+                </div>
+            </div>
+        </div> <!-- col.// -->
+        {% empty %}
+        <div class="col-md-12">
+            <p>No products found.</p>
+        </div>
+        {% endfor %}
+    </div> <!-- row.// -->
+
+
+    <nav class="mt-4" aria-label="Page navigation sample">
+        <ul class="pagination">
+            {% if products.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.previous_page_number }}"
+                        hx-get="/store/?{{ query_string }}&page={{ products.previous_page_number }}" hx-target="#main" hx-swap="outerHTML">Previous</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link">Previous</a></li>
+            {% endif %}
+
+            {% for i in products.paginator.page_range %}
+                {% if products.number == i %}
+                    <li class="page-item active">
+                        <a class="page-link" href="?page={{ i }}"
+                            hx-get="/store/?{{ query_string }}&page={{ i }}" hx-target="#main"  hx-swap="outerHTML" >
+                            {{ i }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}"
+                            hx-get="/store/?{{ query_string }}&page={{ i }}" hx-target="#main" hx-swap="outerHTML">
+                            {{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.next_page_number }}"
+                        hx-get="/store/?{{ query_string }}&page={{ products.next_page_number }}" hx-target="#main">Next</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</main> <!-- col.// -->
