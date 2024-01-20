@@ -12,6 +12,13 @@ INCLUDE STYLES AND COMPONENTS
 ===================== */
 /* ================== HELPERS  =================== */
 
+.selected {
+  background-color: rgb(212, 212, 212) !important;
+  /* Change this to the color you want */
+}
+#suggestion-list li:hover {
+  background-color: rgb(212, 212, 212) !important;
+}
 
 a:hover {
   text-decoration: none;

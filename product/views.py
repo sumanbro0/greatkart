@@ -32,6 +32,7 @@ def store(request):
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     size_ids = request.GET.getlist('size')
+    query=request.GET.get('query')
     
     products_list = Product.objects.all()
 
@@ -43,7 +44,8 @@ def store(request):
         products_list = products_list.filter(base_price__lte=max_price)
     if size_ids:
         products_list = products_list.filter(variants__sizes__id__in=size_ids)
-
+    if query:
+        products_list = products_list.filter(Q(name__icontains=query) | Q(desc__icontains=query))
     
     product_ids = products_list.values_list('id', flat=True).distinct()
 
@@ -64,7 +66,7 @@ def store(request):
     query_params.pop('page', None)
 
     base_query_string = query_params.urlencode()
-
+    print(base_query_string)
     context = {
         'products': products,
         'categories': categories,
@@ -73,8 +75,9 @@ def store(request):
         'n': n,
         'query_string': base_query_string,  # Add this line
     }
-    if request.htmx:
+    referrer = request.META.get('HTTP_REFERER', '')
+
+    if request.htmx and "store" in referrer:
         return render(request, 'products_list.html', context)
+
     return render(request, 'store.html', context)
-
-
