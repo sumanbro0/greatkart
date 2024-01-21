@@ -67,7 +67,6 @@
 </style>
 <section class="section-content padding-y bg">
 	<div class="container">
-
 		<!-- ============================ COMPONENT 1 ================================= -->
 		<div class="card">
 			<div class="row no-gutters">
@@ -102,7 +101,7 @@
 				</aside>
 				<main class="col-md-6 border-left">
 					<article class="content-body">
-
+						<div id="c">
 						<h2 class="title">{{ product.name }}</h2>
 
 						<div class="mb-3">
@@ -114,38 +113,47 @@
 						<p class="{% if in_stock %}in-stock{% else %}out-of-stock{% endif %}">
 							{% if in_stock %}In Stock{% else %}Not In Stock{% endif %}
 						</p>
-
+						</div>
 						<hr>
-						<div class="row">
-							<div class="item-option-select">
-								<h6>Choose Color</h6>
-								<div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-									{% for color in colors %}
-									<label class="btn btn-light">
-										<input type="radio" name="radio_color" value="{{color.id}}"> {{ color.name }}
-									</label>
-									{% endfor %}
+						<form hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-push-url="true" hx-target="#c" id="productForm">
+							{% if colors.count > 0 %}
+							<div class="row">
+								<div class="item-option-select">
+									<h6>Choose Color</h6>
+									<div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+										{% for color in colors %}
+										<label class="btn btn-light">
+											<input type="radio" name="color" value="{{color.id}}">
+											{{ color.name }}
+										</label>
+										{% endfor %}
+									</div>
 								</div>
 							</div>
-						</div> <!-- row.// -->
-						<div class="row">
-							<div class="item-option-select">
-								<h6>Select Size</h6>
-								<div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-									{% for size in sizes %}
-									<label class="btn btn-light">
-										<input type="radio" name="radio_color" value="{{size.id}}"> {{ size.name }}
-									</label>
-									{% endfor %}
+							{% endif %}
+							{% if sizes.count > 0 %}
+							<div class="row">
+								<div class="item-option-select">
+									<h6>Select Size</h6>
+									<div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+										{% for size in sizes %}
+										<label class="btn btn-light">
+											<input type="radio" name="size" value="{{size.id}}">
+											{{ size.name }}
+										</label>
+										{% endfor %}
+									</div>
 								</div>
-							</div>
-						</div> <!-- row.// -->
+							</div> <!-- row.// -->
+							{% endif %}
+						</form>
 						<hr>
 						<a href="./product-detail.html" class="btn  btn-primary"> <span class="text">Add to cart</span>
 							<i class="fas fa-shopping-cart"></i> </a>
 					</article> <!-- product-info-aside .// -->
 				</main> <!-- col.// -->
 			</div> <!-- row.// -->
+			
 		</div> <!-- card.// -->
 		<!-- ============================ COMPONENT 1 END .// ================================= -->
 
@@ -188,3 +196,32 @@
 <!-- ========================= SECTION CONTENT END// ========================= -->
 
 {% endblock content %}
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+
+	var urlParams = new URLSearchParams(window.location.search);
+	var color = urlParams.get('color');
+	var size = urlParams.get('size');
+
+	if (color) {
+		$('input[name="color"][value="' + color + '"]').prop('checked', true).parent().addClass('active');
+	}
+	if (size) {
+		$('input[name="size"][value="' + size + '"]').prop('checked', true).parent().addClass('active');
+	}
+
+
+	$('.btn-group-toggle .btn').on('click', function(event) {
+		$(this).addClass('active').siblings().removeClass('active');
+		$(this).siblings().find('input[type="radio"]').prop('checked', false);
+		var radioInput = $(this).find('input[type="radio"]');
+		radioInput.prop('checked', true);
+		var changeEvent = new Event('change');
+		radioInput[0].dispatchEvent(changeEvent);
+		this.form.dispatchEvent(new Event('submit'));
+	});
+});
+</script>
+{% endblock script %}

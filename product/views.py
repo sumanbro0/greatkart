@@ -84,11 +84,25 @@ def store(request):
 
 
 def product_detail(request, id):
+    print("new request ************")
     product = Product.objects.prefetch_related("images","variants","reviews").get(id=id)
     size_names=product.variants.values_list('sizes__name', flat=True).distinct()
     color_names=product.variants.values_list('color__name', flat=True).distinct()
     sizes=Size.objects.filter(name__in=size_names)
     colors=Color.objects.filter(name__in=color_names)
-    price=product.get_final_price()
-    in_stock=product.is_in_stock()
+    size_id=request.GET.get('size')
+    color_id=request.GET.get('color')
+    variant=None
+    if size_id and color_id:
+        variant=product.variants.filter(sizes__id=size_id,color__id=color_id).first()
+    elif size_id:
+        variant=product.variants.filter(sizes__id=size_id).first()
+    elif color_id:
+        variant=product.variants.filter(color__id=color_id).first()
+        
+        
+    price=product.get_final_price(variant)
+    in_stock=product.is_in_stock(variant)
+    if request.htmx and variant:
+        return render(request, 'detail_content.html', {"product":product,"price":price,"in_stock":in_stock})
     return render(request, 'product_detail.html', {"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock})

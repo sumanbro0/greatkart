@@ -53,7 +53,7 @@ class Product(models.Model):
     def is_in_stock(self, variant=None):
         if not variant or variant.variant_stock is None:
             return self.total_stock > 0
-        return variant.stock > 0
+        return variant.variant_stock > 0
     
     def decrement_stock(self, variant=None, quantity=1):
         if  variant and variant.variant_stock is not None:

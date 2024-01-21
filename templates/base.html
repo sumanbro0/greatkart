@@ -87,7 +87,7 @@
 									<!-- search query from context processors -->
 									<input hx-boost="true" type="text" class="form-control" placeholder="Search" name="query"
 										value="{{ search_query }}" hx-get="{% url 'search' %}"
-										hx-trigger="input delay:1000ms" hx-indicator="#loading-indicator"
+										hx-trigger="input delay:1000ms" 
 										hx-target="#search-suggestions" 
 										hx-push-url="false" hx-swap="outerHTML" autocomplete="off" />
 									<div class="input-group-append">
