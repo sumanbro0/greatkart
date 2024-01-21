@@ -71,14 +71,14 @@
 			<div class="container">
 				<div class="row align-items-center">
 					<div class="col-lg-2 col-md-3 col-6">
-						<a href="{% url 'home' %}" class="brand-wrap">
+						<a hx-target="body" hx-boost="true" hx-get="{% url 'home' %}"  hx-push-url="true" href="{% url 'home' %}" class="brand-wrap">
 							<img class="logo" src="{% static './images/logo.png' %}" />
 						</a>
 						<!-- brand-wrap.// -->
 					</div>
 
 					<!-- col.// -->
-					<a href="{% url 'store' %}" class="btn btn-outline-primary">Store</a>
+					<a href="{% url 'store' %}" hx-target="body"  hx-boost="true" hx-get="{% url 'store' %}" hx-push-url="true" class="btn btn-outline-primary">Store</a>
 					<div class="col-lg col-md-6 col-sm-12 col">
 						{% url 'store' as store_url %}
 						<form hx-boost="true" id="searchForm" action="{% url 'store' %}" class="search" hx-get="{% url 'store' %}" hx-post="{% url 'store' %}" hx-target="{% if request.path == store_url %}#main{% else %}body{% endif %}" hx-swap="outerHTML" hx-trigger="submit" hx-push-url="true">
@@ -113,7 +113,7 @@
 								<small class="title text-muted">Welcome, {{ request.user.first_name }}
 									{{ request.user.last_name }}!</small>
 								<div class="d-flex align-items-center">
-									<a href="{% url 'me' %}">
+									<a href="{% url 'me' %}" hx-get="{% url 'me' %}"  hx-target="body" hx-indicator="#loading-spinner" hx-boost="true" hx-push-url="true">
 										{% if request.user.profile.avatar and request.user.profile.avatar.url %}
 										<img src="{{ request.user.profile.avatar.url }}"
 											alt="{{ request.user.first_name }}" class="rounded-circle" width="30"
@@ -123,7 +123,7 @@
 											class="rounded-circle" width="30" height="30" />
 										{% endif %}
 									</a>
-									<a href="{% url 'me' %}" class="ml-2">Profile</a>
+									<a  href="{% url 'me' %}" hx-get="{% url 'me' %}"  hx-target="body" hx-indicator="#loading-spinner" hx-boost="true" hx-push-url="true" class="ml-2">Profile</a>
 								</div>
 								{% else %}
 								<small class="title text-muted">Welcome guest!</small>
@@ -151,7 +151,7 @@
 		</section>
 		<!-- header-main .// -->
 	</header>
-	{% include "alerts.html" %} {% block content %} {% endblock content %}
+	{% include "alerts.html" %}  {% block content %} {% endblock content %}
 
 	<!-- ========================= FOOTER ========================= -->
 	<footer class="section-footer border-top">

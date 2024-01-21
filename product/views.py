@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 from django.shortcuts import render
-from .models import Category, Product, Size
+from .models import Category, Color, Product, Size
 from django.db.models import Avg
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -77,7 +77,18 @@ def store(request):
     }
     referrer = request.META.get('HTTP_REFERER', '')
 
-    if request.htmx and "store" in referrer:
+    if request.htmx and "store" in referrer and base_query_string:
         return render(request, 'products_list.html', context)
 
     return render(request, 'store.html', context)
+
+
+def product_detail(request, id):
+    product = Product.objects.prefetch_related("images","variants","reviews").get(id=id)
+    size_names=product.variants.values_list('sizes__name', flat=True).distinct()
+    color_names=product.variants.values_list('color__name', flat=True).distinct()
+    sizes=Size.objects.filter(name__in=size_names)
+    colors=Color.objects.filter(name__in=color_names)
+    price=product.get_final_price()
+    in_stock=product.is_in_stock()
+    return render(request, 'product_detail.html', {"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock})

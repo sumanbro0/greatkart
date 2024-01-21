@@ -37,18 +37,19 @@
 			<div class="col-md-3  ">
 				<div class="card card-product-grid">
 					{% if product.images.all %}
-					<a href="./product-detail.html" class="img-wrap">
+					<a hx-push-url="true" href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" hx-get="{% url 'product' product.id %}" class="img-wrap">
 						<img src="{{ product.images.all.0.image.url }}" class="card-img-top">
 					</a>
 					{% endif %}
 					<div class="card-body">
 						<h5 class="card-title">
-							<a href="#" class="title text-primary">{{ product.name }}</a>
+							<a hx-push-url="true" href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-swap="outerHTML"
+									hx-get="{% url 'product' product.id %}" class="title text-primary">{{ product.name }}</a>
 						</h5>
 						<hr class="my-4">
 						<h6 class="card-subtitle mb-2 text-muted">Price</h6>
 						<p class="card-text">${{ product.base_price }}</p>
-						<a href="#" class="btn btn-primary mt-4 ">View Details</a>
+						<a hx-push-url="true" href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" hx-get="{% url 'product' product.id %}" class="btn btn-primary mt-4 ">View Details</a>
 					</div>
 				</div>
 			</div> <!-- col.// -->

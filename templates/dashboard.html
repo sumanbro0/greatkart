@@ -3,8 +3,13 @@
 <style>
 	#content {
 		min-height: 80vh;
+	    justify-content: center;
+    	align-items: center;
 	}
 
+	.center-spinner {
+		position: absolute;
+	}
 	.list-group-item a {
 		color: black;
 	}
@@ -13,13 +18,18 @@
 		color: blue;
 	}
 </style>
+<div id="loading-spinner" style="display: none;">
+	<div class="spinner-border text-primary" role="status">
+		<span class="sr-only">Loading...</span>
+	</div>
+</div>
 <div class="container">
 	<div class="row">
 		<aside class="col-md-4 py-5 ">
 			<ul class="list-group">
 				<li class="list-group-item">
 					<a href="{% url 'profile' %}" hx-get="{% url 'profile' %}" hx-swap="innerHTML" hx-target="#content"
-						hx-trigger="click, load" hx-boost="true" hx-replace-url="true" data-state="profile">
+						hx-trigger="click, load" hx-boost="true" hx-indicator="#loading-spinner" data-state="profile">
 						<i class="fas fa-user"></i> My Profile
 					</a>
 				</li>
@@ -42,8 +52,8 @@
 				</li>
 			</ul>
 		</aside>
-		<main id="content" class="col-md-8 mt-4" hx-swap-oob="true" hx-history-elt>
-			<!-- The content from the views will be loaded here -->
+		<main id="content" class="col-md-8 mt-4">
+			{% include 'spinner.html' %}
 		</main>
 	</div>
 </div>
