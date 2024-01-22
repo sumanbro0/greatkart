@@ -11,8 +11,6 @@ from django.contrib.auth.decorators import login_required
 from .forms import ProfileForm
 
 # Create your views here.
-def index(request):
-    return render(request, 'index.html')
 
 
 
@@ -29,7 +27,7 @@ def signup_view(request):
                 validate_password(password)
             except ValidationError as e:
                 messages.error(request, e.messages[0])
-                return render(request, 'register.html')
+                return render(request, 'profile/register.html')
 
             if User.objects.filter(email=email).exists():
                 messages.error(request, 'Email already exists')
@@ -41,7 +39,7 @@ def signup_view(request):
         else:
             messages.error(request, 'Passwords do not match')
 
-    return render(request, 'register.html')
+    return render(request, 'profile/register.html')
 
 
 def login_view(request):
@@ -55,7 +53,7 @@ def login_view(request):
             return redirect('home')
         else:
             messages.error(request, 'Invalid username or password.')
-    return render(request, 'signin.html')
+    return render(request, 'profile/signin.html')
 
 
 def logout_view(request):
@@ -74,9 +72,9 @@ def update_profile(request):
         profile.full_name = request.POST.get('full_name')
         profile.bio = request.POST.get('bio')
         profile.save()
-        # profile_html = render_to_string('profiles.html', {'profile': profile}, request=request)
-        # return HttpResponse(profile_html)
-        return render(request, 'profiles.html', {'profile': profile})
+        # profile/profile_html = render_to_string('profile/profiles.html', {'profile': profile}, request=request)
+        # return HttpResponse(profile/profile_html)
+        return render(request, 'profile/profiles.html', {'profile': profile})
     return redirect('me')
     
 
@@ -86,17 +84,17 @@ def my_profile(request):
     if created:
         profile.full_name=request.user.first_name + ' ' + request.user.last_name
         profile.save()
-    return render(request, 'profiles.html', {'profile': profile})
+    return render(request, 'profile/profiles.html', {'profile': profile})
 
 
 @login_required
 def orders(request):
     messages.error(request, 'This feature is not available yet.')
-    return render(request, 'place-order.html')
+    return render(request, 'profile/place-order.html')
 
 @login_required
 def me(request):
-    return render(request, 'dashboard.html')
+    return render(request, 'profile/dashboard.html')
 
 @login_required
 def add_address(request):
@@ -112,7 +110,7 @@ def add_address(request):
             messages.success(request, 'Address has been added.')
         else:
             messages.error(request, 'Address already exists.')
-    return render(request, 'add_address.html', {'addresses': addresses})
+    return render(request, 'profile/add_address.html', {'addresses': addresses})
 
 
 @login_required

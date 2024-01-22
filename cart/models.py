@@ -83,7 +83,7 @@ class CartItem(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        unique_together = ('cart', 'product', 'variant_product')
+        unique_together = ('cart', 'product',"variant_product")
 
     def __str__(self) -> str:
         return f"{self.cart.user.username if self.cart.user.username else 'username'} - {self.product.name if self.product.name else 'pname'} - {self.variant_product if self.variant_product else 'none'}"

@@ -1,5 +1,7 @@
 from urllib.parse import urlencode
 from django.shortcuts import render
+
+from cart.models import Cart
 from .models import Category, Color, Product, Size
 from django.db.models import Avg
 from django.core.paginator import Paginator
@@ -8,18 +10,13 @@ from django.db.models import Q
 
 # Create your views here.
 def index(request):
-    products = Product.objects.prefetch_related("images").annotate(average_rating=Avg('reviews__rating')).order_by('-average_rating')[:5]
-    query = request.GET.get('query')
-    if query:
-        products_list = Product.objects.prefetch_related("images").filter(Q(name__icontains=query) | Q(desc__icontains=query))
-        return render(request, 'index.html',{"products":products_list, "query":query})
-
-    return render(request, 'index.html',{"products":products})
+    products = Product.objects.prefetch_related("images").annotate(average_rating=Avg('reviews__rating')).order_by('-average_rating')[:5]  
+    return render(request, 'product/index.html',{"products":products})
 
 def search_suggestions(request):
     query = request.GET.get('query', '')
     items = Product.objects.filter(Q(name__icontains=query) | Q(desc__icontains=query))[:5]
-    return render(request, 'search_suggestions.html', {'items': items})
+    return render(request, 'product/search_suggestions.html', {'items': items})
 
 def frange(start, stop, step):
     i = start
@@ -35,6 +32,7 @@ def store(request):
     query=request.GET.get('query')
     
     products_list = Product.objects.all()
+    cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
 
     if category_ids:
         products_list = products_list.filter(category__id__in=category_ids)
@@ -66,7 +64,6 @@ def store(request):
     query_params.pop('page', None)
 
     base_query_string = query_params.urlencode()
-    print(base_query_string)
     context = {
         'products': products,
         'categories': categories,
@@ -74,35 +71,53 @@ def store(request):
         'price_options': price_options,
         'n': n,
         'query_string': base_query_string,  # Add this line
+        'cart_ids':cart_ids,
     }
     referrer = request.META.get('HTTP_REFERER', '')
 
-    if request.htmx and "store" in referrer and base_query_string:
-        return render(request, 'products_list.html', context)
+    if request.htmx and "store" in referrer:
+        return render(request, 'product/products_list.html', context)
 
-    return render(request, 'store.html', context)
+    return render(request, 'product/store.html', context)
 
 
 def product_detail(request, id):
-    print("new request ************")
-    product = Product.objects.prefetch_related("images","variants","reviews").get(id=id)
+    product = Product.objects.prefetch_related("images","variants",'variants__sizes', 'variants__color',"reviews__user").get(id=id)
+    cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
+    variant_ids = Cart.objects.filter(user=request.user).values_list('items__variant_product__id', flat=True)
+
     size_names=product.variants.values_list('sizes__name', flat=True).distinct()
     color_names=product.variants.values_list('color__name', flat=True).distinct()
     sizes=Size.objects.filter(name__in=size_names)
     colors=Color.objects.filter(name__in=color_names)
     size_id=request.GET.get('size')
     color_id=request.GET.get('color')
+    
+
     variant=None
-    if size_id and color_id:
-        variant=product.variants.filter(sizes__id=size_id,color__id=color_id).first()
-    elif size_id:
-        variant=product.variants.filter(sizes__id=size_id).first()
-    elif color_id:
-        variant=product.variants.filter(color__id=color_id).first()
-        
+
+    if colors and sizes:
+        if size_id and color_id:
+            variant=product.variants.filter(sizes__id=size_id,color__id=color_id).first()
+    else:
+        if size_id:
+            variant=product.variants.filter(sizes__id=size_id).first()
+        elif color_id:
+            variant=product.variants.filter(color__id=color_id).first()
         
     price=product.get_final_price(variant)
     in_stock=product.is_in_stock(variant)
-    if request.htmx and variant:
-        return render(request, 'detail_content.html', {"product":product,"price":price,"in_stock":in_stock})
-    return render(request, 'product_detail.html', {"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock})
+
+    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids}
+
+    referrer=request.META.get('HTTP_REFERER','')
+
+    if variant:
+        context['variant'] = variant.id
+
+    if request.htmx and (variant or "product" in referrer ) :       
+        return render(request, 'product/detail_content.html', context)
+    
+    return render(request, 'product/product_detail.html', context)
+
+    request.GET = {}  # Clear request.GET dictionary

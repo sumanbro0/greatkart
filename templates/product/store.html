@@ -114,23 +114,25 @@
 
 				<div class="row">
 					{% for product in products %}
-					<div class="col-md-4  ">
+					<div class="col-md-5 ">
 						<div class="card card-product-grid">
 							{% if product.images.all %}
-							<a hx-push-url="true" href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" hx-get="{% url 'product' product.id %}" class="img-wrap">
+							<a  href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" class="img-wrap">
 								<img src="{{ product.images.all.0.image.url }}" class="card-img-top">
 							</a>
 							{% endif %}
 							<div class="card-body">
 								<h5 class="card-title">
-									<a href="{% url 'product' product.id %}"  hx-push-url="true"  hx-boost="true" hx-target="body" hx-swap="outerHTML"
-									hx-get="{% url 'product' product.id %} class="title text-primary">{{ product.name }}</a>
+									<a href="{% url 'product' product.id %}"   hx-boost="true" 
+									hx-get="{% url 'product' product.id %}" class="title text-primary">{{ product.name }}</a>
 								</h5>
 								<hr class="my-4">
 								<h6 class="card-subtitle mb-2 text-muted">Price</h6>
 								<p class="card-text">${{ product.base_price }}</p>
-								<a href="{% url 'product' product.id %}" hx-push-url="true"   hx-boost="true" hx-target="body" hx-swap="outerHTML"
-									hx-get="{% url 'product' product.id %}" class="btn btn-primary mt-4 ">View Details</a>
+								<div class="d-flex justify-content-around  mx-auto">
+								
+									<a href="{% url 'product' product.id %}" hx-boost="true" class="btn btn-primary mt-4">View Details</a>
+								</div>
 							</div>
 						</div>
 					</div> <!-- col.// -->
@@ -157,12 +159,14 @@
 							{% if products.number == i %}
 								<li class="page-item active">
 									<a class="page-link" href="?page={{ i }}"
+									hx-boost="true" hx-push-url="true"
 										hx-get="/store/?{{ query_string }}&page={{ i }}" hx-target="#main"  hx-swap="outerHTML" >
 										{{ i }}</a>
 								</li>
 							{% else %}
 								<li class="page-item">
 									<a class="page-link" href="?page={{ i }}"
+									hx-boost="true" hx-push-url="true"
 										hx-get="/store/?{{ query_string }}&page={{ i }}" hx-target="#main" hx-swap="outerHTML">
 										{{ i }}</a>
 								</li>
@@ -171,7 +175,7 @@
 
 						{% if products.has_next %}
 							<li class="page-item">
-								<a class="page-link" href="?page={{ products.next_page_number }}"
+								<a class="page-link" href="?page={{ products.next_page_number }}" hx-boost="true" hx-push-url="true"
 									hx-get="/store/?{{ query_string }}&page={{ products.next_page_number }}" hx-target="#main">Next</a>
 							</li>
 						{% else %}
@@ -185,5 +189,4 @@
 
 	</div> <!-- container .//  -->
 </section>
-<!-- ========================= SECTION CONTENT END// ========================= -->
 {% endblock content %}

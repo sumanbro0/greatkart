@@ -6,32 +6,37 @@
         </div>
     </header><!-- sect-heading -->
 
-    <div class="row">
-        {% for product in products %}
-        <div class="col-md-4  ">
-            <div class="card card-product-grid">
-                {% if product.images.all %}
-                <a hx-push-url="true" href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" hx-get="{% url 'product' product.id %}" class="img-wrap">
-                    <img src="{{ product.images.all.0.image.url }}" class="card-img-top">
-                </a>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a  href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-push-url="true" hx-swap="outerHTML"	hx-get="{% url 'product' product.id %}" class="title text-primary">{{ product.name }}</a>
-                    </h5>
-                    <hr class="my-4">
-                    <h6 class="card-subtitle mb-2 text-muted">Price</h6>
-                    <p class="card-text">${{ product.base_price }}</p>
-                    <a  href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" hx-push-url="true" hx-swap="outerHTML"							hx-get="{% url 'product' product.id %}" class="btn btn-primary mt-4">View Details</a>
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-5 ">
+        <div class="card card-product-grid">
+            {% if product.images.all %}
+            <a href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" class="img-wrap">
+                <img src="{{ product.images.all.0.image.url }}" class="card-img-top">
+            </a>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'product' product.id %}" hx-boost="true" hx-get="{% url 'product' product.id %}"
+                        class="title text-primary">{{ product.name }}</a>
+                </h5>
+                <hr class="my-4">
+                <h6 class="card-subtitle mb-2 text-muted">Price</h6>
+                <p class="card-text">${{ product.base_price }}</p>
+                <div class="d-flex justify-content-around  mx-auto">
+
+                    <a href="{% url 'product' product.id %}" hx-boost="true" class="btn btn-primary mt-4">View Details</a>
+
                 </div>
             </div>
-        </div> <!-- col.// -->
-        {% empty %}
-        <div class="col-md-12">
-            <p>No products found.</p>
         </div>
-        {% endfor %}
-    </div> <!-- row.// -->
+    </div> <!-- col.// -->
+    {% empty %}
+    <div class="col-md-12">
+        <p>No products found.</p>
+    </div>
+    {% endfor %}
+</div> <!-- row.// -->
 
 
     <nav class="mt-4" aria-label="Page navigation sample">
