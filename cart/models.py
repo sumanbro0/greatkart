@@ -81,6 +81,10 @@ class CartItem(models.Model):
     quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def total(self):
+        return self.product.get_final_price(self.variant_product) * self.quantity
+
     class Meta:
         ordering = ["-created_at"]
         unique_together = ('cart', 'product',"variant_product")

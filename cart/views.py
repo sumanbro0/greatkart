@@ -116,9 +116,7 @@ def cart(request):
             messages.error(request,"The item does not exist in your cart.")
             
     cart=Cart.objects.prefetch_related("items__variant_product","items__product").get(user=request.user)
-    for item in cart.items.all():
-        item.total_price = item.quantity * item.product.get_final_price(item.variant_product)
-
+    
     context={"cart":cart}
     return render(request,"cart/cart.html",context) 
 
