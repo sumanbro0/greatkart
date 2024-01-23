@@ -26,7 +26,6 @@
 </script>
 {% endblock script %}
 
-{% include "alerts.html" %}
 <article class="content-body">
     <div id="c">
         <h2 class="title">{{ product.name }}</h2>
@@ -42,7 +41,7 @@
         </p>
     </div>
     <hr>
-    <form hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-push-url="false" hx-target="closest main"
+    <form hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-push-url="false" hx-target="body"
 
         hx-swap="innerHTML" id="productForm">
         {% if colors %}
@@ -86,13 +85,14 @@
     </form>
     <hr>
     {% if product.id not in cart_ids or variant not in variant_ids %}
-    <a id="#cart" hx-get="{% url 'add_to_cart' product.id %}?id={{variant}}" hx-target="closest main" hx-include="input[name='color']:checked, input[name='size']:checked" hx-swap="innerHTML" href="{% url 'add_to_cart' product.id %}?id={{variant}}" class="btn  btn-primary"> <span
+    <a id="#cart" hx-get="{% url 'add_to_cart' product.id %}?id={{variant}}" hx-target="body" hx-include="input[name='color']:checked, input[name='size']:checked" hx-swap="innerHTML" href="{% url 'add_to_cart' product.id %}?id={{variant}}" class="btn  btn-primary"> <span
             class="text">Add to
             cart</span>
         <i class="fas fa-shopping-cart"></i> </a>
     {% else %}
-    <a id="#cart" hx-boost="true" href="{% url 'remove_from_cart' product.id %}" class="btn  btn-danger"> <span
-            class="text">Remove from cart</span>
-        <i class="fas fa-shopping-cart"></i> </a>
+    <button id="#cart" hx-include="input[name='color']:checked, input[name='size']:checked" hx-boost="true" hx-get="{% url 'remove_from_cart' product.id %}?id={{variant}}" 
+    hx-swap="innerHTML" hx-target="body" hx-push-url="false" 
+    class="btn text-white btn-danger"> <span class="text">Remove from cart</span>
+        <i class="fas fa-shopping-cart"></i> </button>
     {% endif %}
 </article>

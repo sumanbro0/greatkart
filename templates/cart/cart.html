@@ -18,13 +18,18 @@
 </tr>
 </thead>
 <tbody>
+	{% for item in cart.items.all %}
 <tr>
 	<td>
 		<figure class="itemside align-items-center">
-			<div class="aside"><img src="./images/items/11.jpg" class="img-sm"></div>
+			<div class="aside">
+				<img src="{{ item.product.images.all.first.image.url }}" class="img-sm">
+			</div>
 			<figcaption class="info">
-				<a href="#" class="title text-dark">Camera Canon EOS M50 Kit</a>
-				<p class="text-muted small">Matrix: 25 Mpx <br> Brand: Canon</p>
+				<a href="{% url 'product' item.product.id %}?size={{item.variant_product.sizes.id}}&color={{item.variant_product.color.id}}" hx-boost="true" hx-target="body" hx-swap="innerHTML" class="title text-dark">{{item.product.name}}</a>
+				{% if item.variant_product %}
+				<p class="text-muted small">size: {{item.variant_product.sizes.name}} <br> color: {{item.variant_product.color.name}}</p>
+				{% endif %}
 			</figcaption>
 		</figure>
 	</td>
@@ -33,25 +38,30 @@
 					<div class="col"> 
 						<div class="input-group input-spinner">
 							<div class="input-group-prepend">
-							<button class="btn btn-light" type="button" id="button-plus"> <i class="fa fa-minus"></i> </button>
+								<button class="btn btn-light button-minus" type="button"> <i class="fa fa-minus"></i> </button>
 							</div>
-							<input type="text" class="form-control"  value="1">
+							<input hx-get="{% url 'cart' %}" hx-vals='{"cart_item_id": "{{item.id}}"}'  name="quantity" type="text" class="form-control" hx-trigger="input delay:750ms,change" hx-target="body" hx-push-url="false"  value="{{item.quantity}}">
 							<div class="input-group-append">
-							<button class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-plus"></i> </button>
+								<button class="btn btn-light button-plus" type="button"> <i class="fa fa-plus"></i> </button>
 							</div>
 						</div> <!-- input-group.// -->
 					</div> <!-- col.// -->
 	</td>
 	<td> 
 		<div class="price-wrap"> 
-			<var class="price">$1156.00</var> 
-			<small class="text-muted"> $315.20 each </small> 
+			<var class="price">$ {{item.total_price}} </var> 
+			{% if item.variant_product %}
+			<small class="text-muted">${{ item.variant_product.get_final_price }}</var> 
+			{% else %}
+			<small class="text-black font-weight-bold ">${{ item.product.get_final_price }} for each</var> 
+			{% endif %}
 		</div> <!-- price-wrap .// -->
 	</td>
 	<td class="text-right"> 
-	<a href="" class="btn btn-danger"> Remove</a>
+	<a href="{% url 'remove_from_cart' item.product.id %}" hx-boost="true" hx-vals='{"id":"{{item.variant_product.id}}"}' class="btn btn-danger"> Remove</a>
 	</td>
 </tr>
+{% endfor %}
 
 </tbody>
 </table>
@@ -63,23 +73,15 @@
 		<div class="card">
 		<div class="card-body">
 			<dl class="dlist-align">
-			  <dt>Total price:</dt>
-			  <dd class="text-right">$69.97</dd>
-			</dl>
-			<dl class="dlist-align">
-			  <dt>Tax:</dt>
-			  <dd class="text-right"> $10.00</dd>
-			</dl>
-			<dl class="dlist-align">
 			  <dt>Total:</dt>
-			  <dd class="text-right text-dark b"><strong>$59.97</strong></dd>
+			  <dd class="text-right text-dark b"><strong>${{cart.total}}</strong></dd>
 			</dl>
 			<hr>
 			<p class="text-center mb-3">
 				<img src="{% static 'images/misc/payments.png' %}" height="26">
 			</p>
-			<a href="./place-order.html" class="btn btn-primary btn-block"> Checkout </a>
-			<a href="./store.html" class="btn btn-light btn-block">Continue Shopping</a>
+			<a href="#" class="btn btn-primary btn-block"> Checkout </a>
+			<a href="{% url 'home' %}" hx-boost="true" class="btn btn-light btn-block">Continue Shopping</a>
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
 
@@ -90,3 +92,32 @@
 </div> 
 </section>
 {% endblock content %}
+
+{% block script %}
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		
+		document.addEventListener('click', function (event) {
+			var target = event.target;
+			if (target.tagName === 'I') {
+				target = target.parentNode;
+			}
+			if (target.classList.contains('button-plus')) {
+				handleQuantityChange(target, 1);
+			} else if (target.classList.contains('button-minus')) {
+				handleQuantityChange(target, -1);
+			}
+		});
+
+		function handleQuantityChange(button, delta) {
+			var input = button.closest('.input-spinner').querySelector("input[name='quantity']");
+			var value = parseInt(input.value);
+			if (!isNaN(value)) {
+				var newValue = Math.max(value + delta, 1); // Don't allow negative quantity
+				input.value = newValue;
+				input.dispatchEvent(new Event('change', { bubbles: true }));
+			}
+		}
+	});
+</script>
+{% endblock script %}

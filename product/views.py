@@ -93,9 +93,7 @@ def product_detail(request, id):
     size_id=request.GET.get('size')
     color_id=request.GET.get('color')
     
-
     variant=None
-
     if colors and sizes:
         if size_id and color_id:
             variant=product.variants.filter(sizes__id=size_id,color__id=color_id).first()
@@ -104,20 +102,14 @@ def product_detail(request, id):
             variant=product.variants.filter(sizes__id=size_id).first()
         elif color_id:
             variant=product.variants.filter(color__id=color_id).first()
-        
     price=product.get_final_price(variant)
     in_stock=product.is_in_stock(variant)
 
     context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids}
 
-    referrer=request.META.get('HTTP_REFERER','')
 
     if variant:
         context['variant'] = variant.id
 
-    if request.htmx and (variant or "product" in referrer ) :       
-        return render(request, 'product/detail_content.html', context)
-    
     return render(request, 'product/product_detail.html', context)
 
-    request.GET = {}  # Clear request.GET dictionary

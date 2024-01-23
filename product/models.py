@@ -74,6 +74,10 @@ class ProductVariant(models.Model):
     def __str__(self) -> str:
         return f"{self.product.name if self.product.name else 'pname'} - {self.color if self.color else 'none'} - {self.sizes if self.sizes else 'none'}"
     
+
+    def get_final_price(self):
+        return self.product.get_final_price(self)
+    
     class Meta:
         ordering = ["variant_price","variant_stock",'product']
         unique_together = ('product', 'color', 'sizes')
