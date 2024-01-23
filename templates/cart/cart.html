@@ -49,11 +49,11 @@
 	</td>
 	<td> 
 		<div class="price-wrap"> 
-			<var class="price">$ {{item.total_price}} </var> 
+			<var class="price">$ {{item.total}} </var> 
 			{% if item.variant_product %}
-			<small class="text-muted">${{ item.variant_product.get_final_price }}</var> 
+			<small style="font-size: 0.9em;" class="text-muted font-weight-bold ">$  {{ item.variant_product.get_final_price }} for each item</var> 
 			{% else %}
-			<small class="text-black font-weight-bold ">${{ item.product.get_final_price }} for each</var> 
+			<small style="font-size: 0.8em;" class="text-muted font-weight-bold">$  {{ item.product.get_final_price }} for each item</var> 
 			{% endif %}
 		</div> <!-- price-wrap .// -->
 	</td>
