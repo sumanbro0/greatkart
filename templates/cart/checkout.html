@@ -47,8 +47,6 @@
 <!-- ========================= SECTION CONTENT END// ========================= -->
 
 
-{% endblock content %}
-{% block script %}
 
 <script>
 
@@ -59,8 +57,8 @@
 				});
 			});
 		};
-
+document.addEventListener('DOMContentLoaded',handleSelection);
 document.body.addEventListener('htmx:afterSwap',handleSelection);
 document.body.addEventListener('htmx:load',handleSelection);
 </script>
-{% endblock script %}
+{% endblock content %}
