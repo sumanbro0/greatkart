@@ -52,15 +52,14 @@
 
 <script>
 
-	document.querySelectorAll('input[name="address"]').forEach(item=>{
-		
-		item.addEventListener('change', function() {
-			document.querySelector('input[name="address_id"]').value = this.value;
-		}
-		)
-	})
-	
-		
-
+	 function handleSelection() {
+			document.querySelectorAll('input[name="addr"]').forEach(item => {
+				item.addEventListener('change', function () {
+					document.querySelector('input[name="address_id"]').value = this.value;
+				});
+			});
+		};
+document.body.addEventListener('htmx:afterSwap',handleSelection);
+document.addEventListener('htmx:load',handleSelection);
 </script>
 {% endblock script %}

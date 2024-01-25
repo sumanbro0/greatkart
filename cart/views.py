@@ -152,7 +152,7 @@ def checkout(request):
 
 
 @login_required
-def initiate_khalti_payment(request,order):
+def initiate_khalti_payment(request,cart,aid):
     
 
     url = "https://a.khalti.com/api/v2/epayment/initiate/"
@@ -161,12 +161,12 @@ def initiate_khalti_payment(request,order):
     payload = json.dumps({
         "return_url":return_url ,
         "website_url": website_url,
-        "amount": order.total * 100,
-        "purchase_order_id": order.id,
-        "purchase_order_name": "order_"+str(order.id),
+        "amount": cart.total_with_discount * 100,
+        "purchase_order_id": f"{cart.id},{aid}",
+        "purchase_order_name": "order_"+str(cart.id),
         "customer_info": {
-            "name": order.user.profile.full_name,
-            "email": order.user.email   
+            "name": cart.user.profile.full_name,
+            "email": cart.user.email   
             }
     })
     headers = {
@@ -199,12 +199,8 @@ def place_order(request):
         return render(request,"cart/order_complete.html",{"order":o,"pod":True})
     
     if payment_method=="khalti":
-        o=cart.convert_to_order(address)
-        res=initiate_khalti_payment(request,o)
+        res=initiate_khalti_payment(request,cart,address_id)
         if res.get("pidx",None):
-            o.payment_id=res['pidx']
-            o.is_paid=True
-            o.save()
             return HttpResponse('<script>window.location.href="{}";</script>'.format(res['payment_url']))
         else:
             messages.error(request,"Error occured while placing order. Please try again.")
@@ -214,9 +210,27 @@ def place_order(request):
 
 @login_required
 def order_complete(request):
-    order_id=request.GET.get("purchase_order_id",None)
-    o=Order.objects.select_related("user","shipping_address","coupon").get(id=order_id,user=request.user)
-    return render(request,"cart/order_complete.html",{"order":o})
+    cart_id=request.GET.get("purchase_order_id",None)
+    if cart_id:
+        cart_id, aid = request.GET.get('purchase_order_id').split(",")
+    address=Address.objects.get(id=aid,profile__user=request.user)
+    if not address:
+        messages.error(request,"Address does not exist.")
+        return redirect("checkout")
+    o=Cart.objects.get(id=cart_id,user=request.user)
+    if not o:
+        messages.error(request,"Order does not exist.")
+        return redirect("home")
+    if o.items.count() < 1:
+        messages.error(request,"Your cart is empty.")
+        return redirect("home")
+    
+    order=o.convert_to_order(address,False)
+    print(order)
+    order.payment_id=request.GET.get("pidx",None)
+    order.is_paid=True
+    order.save()
+    return render(request,"cart/order_complete.html",{"order":order})
 
 
 

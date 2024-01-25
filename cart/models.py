@@ -46,31 +46,31 @@ class Cart(models.Model):
             total = total - self.coupon.discount_price
         return total
     
-    def convert_to_order(self, shipping_address):
+    def convert_to_order(self, shipping_address,partial):
         order = Order.objects.create(
             user=self.user,
             shipping_address=shipping_address,
             total=self.total_with_discount,
             coupon=self.coupon
-                )
-
-        order_items = []
-        for item in self.items.all():
-            order_item = OrderItem(
-                order=order,
-                product=item.product,
-                variant_product=item.variant_product,
-                quantity=item.quantity,
-                product_name=item.product.name,
-                product_price=item.product.get_final_price(item.variant_product),
             )
-            order_items.append(order_item)
-            item.product.decrement_stock(item.variant_product, item.quantity)
+        if not partial:
+            order_items = []
+            for item in self.items.all():
+                order_item = OrderItem(
+                    order=order,
+                    product=item.product,
+                    variant_product=item.variant_product,
+                    quantity=item.quantity,
+                    product_name=item.product.name,
+                    product_price=item.product.get_final_price(item.variant_product),
+                )
+                order_items.append(order_item)
+                item.product.decrement_stock(item.variant_product, item.quantity)
 
-        OrderItem.objects.bulk_create(order_items)
-        self.items.all().delete() 
-        self.coupon = None
-        self.save()
+            OrderItem.objects.bulk_create(order_items)
+            self.items.all().delete() 
+            self.coupon = None
+            self.save()
         return order
 
     def __str__(self):
