@@ -1,0 +1,51 @@
+
+
+<ul class="list-group position-absolute w-100" id="suggestion-list" style="z-index: 1000;">
+{% for item in items %}
+    <li class="list-group-item"><a href="#" class="suggestion">{{ item.name }}</a></li>
+{% endfor %}
+</ul>
+
+<script>
+    $(document).ready(function () {
+        var $input = $('input[name="query"]');
+        var selectedIndex = -1;
+        var $listItems = $('#suggestion-list li');
+        var $form = $input.closest('form'); 
+        $input.on("input", function (e) {
+            e.preventDefault();
+            $listItems.parent().show();
+            selectedIndex = -1;
+        });
+        $(document).on('keydown', function (e) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % $listItems.length;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + $listItems.length) % $listItems.length;
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex !== -1){
+                    $input.val($($listItems[selectedIndex]).text());
+                }
+                $form[0].dispatchEvent(new Event('submit', { cancelable: true }));
+                $listItems.parent().hide(); // Hide the suggestions list
+            }
+
+            $listItems.removeClass('selected');
+            $($listItems[selectedIndex]).addClass('selected');
+        });
+        $listItems.each(function () {
+            $(this).on('click', function (e) {
+                e.preventDefault();
+                $input.val($(this).text());
+                $form[0].dispatchEvent(new Event('submit', { cancelable: true }));
+                $listItems.parent().hide(); // Hide the suggestions list
+
+            });
+        });
+
+        
+    });
+</script>

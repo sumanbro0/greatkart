@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+<div class="container">
+
+
+<div class="row">
+	<aside class="col-lg-9">
+<div class="card">
+<table class="table table-borderless table-shopping-cart">
+<thead class="text-muted">
+<tr class="small text-uppercase">
+  <th scope="col">Product</th>
+  <th scope="col" width="120">Quantity</th>
+  <th scope="col" width="120">Price</th>
+  <th scope="col" class="text-right" width="200"> </th>
+</tr>
+</thead>
+<tbody>
+	{% for item in cart.items.all %}
+<tr>
+	<td>
+		<figure class="itemside align-items-center">
+			<div class="aside">
+				<img src="{{ item.product.images.all.first.image.url }}" class="img-sm">
+			</div>
+			<figcaption class="info">
+				<a href="{% url 'product' item.product.id %}?size={{item.variant_product.sizes.id}}&color={{item.variant_product.color.id}}" hx-boost="true" hx-target="body" hx-swap="innerHTML" class="title text-dark">{{item.product.name}}</a>
+				{% if item.variant_product %}
+				<p class="text-muted small">size: {{item.variant_product.sizes.name}} <br> color: {{item.variant_product.color.name}}</p>
+				{% endif %}
+			</figcaption>
+		</figure>
+	</td>
+	<td> 
+		<!-- col.// -->
+					<div class="col"> 
+						<div class="input-group input-spinner">
+							<div class="input-group-prepend">
+								<button class="btn btn-light button-minus" type="button"> <i class="fa fa-minus"></i> </button>
+							</div>
+							<input hx-get="{% url 'cart' %}" hx-vals='{"cart_item_id": "{{item.id}}"}'  name="quantity" type="text" class="form-control" hx-trigger="input delay:750ms,change" hx-target="body" hx-push-url="false"  value="{{item.quantity}}">
+							<div class="input-group-append">
+								<button class="btn btn-light button-plus" type="button"> <i class="fa fa-plus"></i> </button>
+							</div>
+						</div> <!-- input-group.// -->
+					</div> <!-- col.// -->
+	</td>
+	<td> 
+		<div class="price-wrap"> 
+			<var class="price">$ {{item.total}} </var> 
+			{% if item.variant_product %}
+			<small style="font-size: 0.9em;" class="text-muted font-weight-bold ">$  {{ item.variant_product.get_final_price }} for each item</var> 
+			{% else %}
+			<small style="font-size: 0.8em;" class="text-muted font-weight-bold">$  {{ item.product.get_final_price }} for each item</var> 
+			{% endif %}
+		</div> <!-- price-wrap .// -->
+	</td>
+	<td class="text-right"> 
+	<a href="{% url 'remove_from_cart' item.product.id %}" hx-boost="true" hx-vals='{"id":"{{item.variant_product.id}}"}' class="btn btn-danger"> Remove</a>
+	</td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+</div> <!-- card.// -->
+
+	</aside> <!-- col.// -->
+	<aside class="col-lg-3">
+
+		<div class="card">
+		<div class="card-body">
+			<dl class="dlist-align">
+			  <dt>Total:</dt>
+			  <dd class="text-right text-dark b"><strong>${{cart.total}}</strong></dd>
+			</dl>
+			<hr>
+			<p class="text-center mb-3">
+				<img src="{% static 'images/misc/payments.png' %}" height="26">
+			</p>
+			{% if cart.items.all %}
+			<a href="{% url 'checkout' %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" class="btn btn-primary btn-block"> Checkout </a>
+			{% endif %}
+			<a href="{% url 'home' %}" hx-boost="true" class="btn btn-light btn-block">Continue Shopping</a>
+		</div> <!-- card-body.// -->
+		</div> <!-- card.// -->
+
+</aside> <!-- col.// -->
+
+
+</div> 
+</div> 
+</section>
+{% endblock content %}

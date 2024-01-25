@@ -1,0 +1,55 @@
+{% load static %}
+
+<aside class="col-md-4">
+    <div class="card">
+        <div class="card-body">
+            <dl class="dlist-align">
+                <dt>Total price:</dt>
+                <dd class="text-right">$ {{cart.total}} </dd>
+            </dl>
+            <dl class="dlist-align">
+                <dt>Discount:</dt>
+                <dd class="text-right"> </dd>
+            </dl>
+            <dl class="dlist-align">
+                <dt>Total:</dt>
+                <dd class="text-right text-dark b"><strong>${{ cart.total }}</strong></dd>
+            </dl>
+            <hr>
+            <p class="text-center mb-3">
+                <img src="{% static '/images/misc/payments.png' %}" height="26">
+            </p>
+            <form action="{% url 'place_order' %}" method="get" >
+            <article class="py-3 ">
+            
+                <div class="card">
+                    <header class="card-header">
+                        <img src="{% static 'images/logo1.png' %}" class="float-right" height="24">
+                        <label class="form-check collapsed" data-toggle="collapse" data-target="#pay_paynet">
+                            <input class="form-check-input" name="payment" checked type="radio" value="khalti">
+                            <h6 class="form-check-label">
+                                Khalti pay
+                            </h6>
+                        </label>
+                    </header>
+
+                </div> <!-- card.// -->
+                <div class="card">
+                    <header class="card-header">
+
+                        <label class="form-check" data-toggle="collapse" data-target="#pay_payme">
+                            <input class="form-check-input" name="payment" type="radio" value="pod">
+                            <h6 class="form-check-label"> Pay on delivery </h6>
+                        </label>
+                    </header>
+
+                </div> <!-- card.// -->
+                <input type="hidden" name="address_id" value="">
+            </article>
+            <button type="submit" class="btn btn-primary btn-block"> Place Order </button>
+            </form>
+
+        </div> <!-- card-body.// -->
+    </div> <!-- card.// -->
+</aside> <!-- col.// -->
+</div> <!-- row.// -->

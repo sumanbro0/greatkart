@@ -1,5 +1,7 @@
+from collections.abc import Iterable
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg
 
 
 class Category(models.Model):
@@ -41,6 +43,10 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+    @property
+    def get_avg_rating(self):
+        return self.reviews.aggregate(Avg('rating'))['rating__avg']
+    
     def get_final_price(self, variant=None):
         if not variant or variant.variant_price is None:
             return self.base_price
@@ -52,7 +58,7 @@ class Product(models.Model):
     def is_in_stock(self, variant=None):
         if not variant or variant.variant_stock is None:
             return self.total_stock > 0
-        return variant.stock > 0
+        return variant.variant_stock > 0
     
     def decrement_stock(self, variant=None, quantity=1):
         if  variant and variant.variant_stock is not None:
@@ -73,6 +79,10 @@ class ProductVariant(models.Model):
     def __str__(self) -> str:
         return f"{self.product.name if self.product.name else 'pname'} - {self.color if self.color else 'none'} - {self.sizes if self.sizes else 'none'}"
     
+
+    def get_final_price(self):
+        return self.product.get_final_price(self)
+    
     class Meta:
         ordering = ["variant_price","variant_stock",'product']
         unique_together = ('product', 'color', 'sizes')
@@ -87,24 +97,11 @@ class ProductImage(models.Model):
 
 
 
+
 class Review(models.Model):
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey('auth.User', related_name='reviews', on_delete=models.CASCADE)
     comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return self.product.name
-    
-
-
-class Rating(models.Model):
-    product = models.ForeignKey(Product, related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey('auth.User', related_name='ratings', on_delete=models.CASCADE)
     rating = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

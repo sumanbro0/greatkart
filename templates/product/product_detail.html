@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.336);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: calc(50% - 25px); /* Center vertically */
+    }
+
+	.carousel-item img {
+		object-fit: contain; 
+	}
+
+	.img-big-wrap {
+		max-width: 80%;
+		margin: auto; 
+	}
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-image: none;
+    }
+
+    .carousel-control-prev-icon:before,
+    .carousel-control-next-icon:before {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: no-repeat center center;
+        background-size: 100% 100%;
+		font-size: 32px;
+    }
+
+    .carousel-control-prev-icon:before {
+        content: '\2039'; /* Default Bootstrap previous icon */
+    }
+
+    .carousel-control-next-icon:before {
+        content: '\203A'; /* Default Bootstrap next icon */
+    }
+	 .carousel-item {
+        transition: opacity 1s ease-in-out;
+    }
+
+    /* Align the icon in the button */
+    .btn i {
+    margin-left: 5px;
+    vertical-align: middle;
+    font-size: 20px!important; /* Adjust this value to increase or decrease the icon size */
+}
+.in-stock {
+        color: green;
+    }
+
+    .out-of-stock {
+        color: red;
+    }
+</style>
+<section class="section-content padding-y bg" >
+	<div class="container">
+		<!-- ============================ COMPONENT 1 ================================= -->
+		<div class="card">
+			<div class="row no-gutters">
+				<aside class="col-md-6">
+					<article class="gallery-wrap">
+						<div class="img-big-wrap">
+							<div id="productCarousel" class="carousel slide" data-ride="carousel">
+								<div class="carousel-inner">
+									{% for image in product.images.all %}
+									<div class="carousel-item {% if forloop.first %}active{% endif %}">
+										<img class="d-block w-100" src="{{ image.image.url }}" alt="Product image">
+									</div>
+									{% endfor %}
+								</div>
+								{% if product.images.all.count > 1 %}
+								<a class="carousel-control-prev" href="#productCarousel" role="button"
+									data-slide="prev">
+									<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+									<span class="sr-only">Previous</span>
+								</a>
+								<a class="carousel-control-next" href="#productCarousel" role="button"
+									data-slide="next">
+									<span class="carousel-control-next-icon" aria-hidden="true"></span>
+									<span class="sr-only">Next</span>
+								</a>
+								{% endif %}
+							</div>
+						</div>
+
+
+					</article> <!-- gallery-wrap .end// -->
+				</aside>
+				<main id="main" class="col-md-6 border-left">
+					{% include 'product/detail_content.html' %}
+					 <!-- product-info-aside .// -->
+				</main> <!-- col.// -->
+			</div> <!-- row.// -->
+			
+		</div> <!-- card.// -->
+		<!-- ============================ COMPONENT 1 END .// ================================= -->
+
+		<br>
+		<div class="row" id="row">
+    <div class="col-md-12  ">
+
+       
+        
+				<div id="R" class="col-md-12 ">
+					{% include 'product/reviews.html' %}
+				</div>
+<!-- Add Review Button -->
+
+<!-- Add Review Modal -->
+
+
+			</div> <!-- col.// -->
+		</div> <!-- row.// -->
+
+
+	</div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock content %}

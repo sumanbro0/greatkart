@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- ========================= SECTION PAGETOP ========================= -->
+<section class="section-pagetop bg">
+	<div class="container">
+		<h2 class="title-page">Our Store</h2>
+
+	</div> <!-- container //  -->
+</section>
+<!-- ========================= SECTION INTRO END// ========================= -->
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+	<div class="container">
+
+		<div class="row">
+			<aside class="col-md-3">
+
+				<div class="card shadow-lg ">
+					<article class="filter-group">
+						<form hx-get="/store/" hx-target="#main" hx-swap="outerHTML">
+							<!-- Categories filter -->
+							<article class="filter-group">
+								<header class="card-header">
+									<a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true"
+										class="">
+										<i class="icon-control fa fa-chevron-down"></i>
+										<h6 class="title">Categories</h6>
+									</a>
+								</header>
+								<div class="filter-content collapse show" id="collapse_1">
+									<div class="card-body">
+										<ul class="list-menu">
+											{% for category in categories %}
+											<li><input type="checkbox" name="category" value="{{category.id}}">
+												{{category.name}} </li>
+											{% endfor %}
+										</ul>
+									</div> <!-- card-body.// -->
+								</div>
+							</article> <!-- filter-group  .// -->
+
+							<!-- Sizes filter -->
+							<article class="filter-group">
+								<header class="card-header">
+									<a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true"
+										class="">
+										<i class="icon-control fa fa-chevron-down"></i>
+										<h6 class="title">Sizes </h6>
+									</a>
+								</header>
+								<div class="filter-content collapse show" id="collapse_4">
+									<div class="card-body">
+										{% for size in sizes %}
+										<label class="checkbox-btn">
+											<input type="checkbox" name="size" value="{{size.id}}">
+											<span class="btn btn-light"> {{size.name}} </span>
+										</label>
+										{% endfor %}
+									</div><!-- card-body.// -->
+								</div>
+							</article> <!-- filter-group .// -->
+
+							<!-- Price range filter -->
+							<article class="filter-group">
+								<header class="card-header">
+									<a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true"
+										class="">
+										<i class="icon-control fa fa-chevron-down"></i>
+										<h6 class="title">Price range </h6>
+									</a>
+								</header>
+								<div class="filter-content collapse show" id="collapse_3">
+									<div class="card-body">
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label>Min</label>
+												<select class="mr-2 form-control" name="min_price">
+													{% for price in price_options %}
+													<option value="{{price}}" {% if forloop.first %}selected{% endif %}>
+														${{price}}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div class="form-group text-right col-md-6">
+												<label>Max</label>
+												<select class="mr-2 form-control" name="max_price">
+													{% for price in price_options %}
+													<option value="{{price}}" {% if forloop.last %}selected{% endif %}>
+														${{price}}</option>
+													{% endfor %}>
+												</select>
+											</div>
+										</div> <!-- form-row.// -->
+										<button type="submit" class="btn btn-block btn-primary">Apply</button>
+									</div><!-- card-body.// -->
+								</div>
+							</article> <!-- filter-group .// -->
+						</form>
+					</article> <!-- filter-group .// -->
+
+				</div>
+
+			</aside> <!-- col.// -->
+			{% include 'product/products_list.html' %}
+		</div>
+
+	</div> <!-- container .//  -->
+</section>
+{% endblock content %}

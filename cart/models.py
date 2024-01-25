@@ -37,6 +37,11 @@ class Cart(models.Model):
         total = 0
         for item in self.items.all():
             total += item.product.get_final_price(item.variant_product) * item.quantity
+        return total
+
+    @property
+    def total_with_discount(self):
+        total=self.total
         if self.coupon and self.coupon.is_expired == False and total >= self.coupon.minimum_amount:
             total = total - self.coupon.discount_price
         return total
@@ -45,7 +50,7 @@ class Cart(models.Model):
         order = Order.objects.create(
             user=self.user,
             shipping_address=shipping_address,
-            total=self.total,
+            total=self.total_with_discount,
             coupon=self.coupon
                 )
 
@@ -81,9 +86,13 @@ class CartItem(models.Model):
     quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def total(self):
+        return self.product.get_final_price(self.variant_product) * self.quantity
+
     class Meta:
         ordering = ["-created_at"]
-        unique_together = ('cart', 'product', 'variant_product')
+        unique_together = ('cart', 'product',"variant_product")
 
     def __str__(self) -> str:
         return f"{self.cart.user.username if self.cart.user.username else 'username'} - {self.product.name if self.product.name else 'pname'} - {self.variant_product if self.variant_product else 'none'}"
@@ -114,7 +123,10 @@ class Order(models.Model):
     shipping_address = models.ForeignKey('profiles.Address', related_name='shipping_address', on_delete=models.SET_NULL, null=True, blank=True)
     total=models.FloatField(default=0.0,validators=[MinValueValidator(1.0)],help_text="Total price of order, should be more than 1.0 ")
     coupon=models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True,blank=True)
-    coupon_code=models.CharField(max_length=10,default="")
+    coupon_code=models.CharField(max_length=10,default="",null=True,blank=True)
+    payment_id=models.CharField(max_length=100,null=True,blank=True)
+
+
 
     def save(self, *args, **kwargs):
         if self.coupon:
@@ -134,6 +146,10 @@ class OrderItem(models.Model):
     product_name = models.CharField(max_length=255,null=True, blank=True,default="")
     product_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     quantity = models.IntegerField(default=1)
+
+    @property
+    def total(self):
+        return self.product_price * self.quantity
 
 
     def clean(self):

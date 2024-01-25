@@ -1,0 +1,99 @@
+{% load static %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 12pt;
+    }
+    .container {
+        width: 100%;
+        padding: 20px;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .text-right {
+        text-align: right;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table th, .table td {
+        border: 1px solid #000;
+        padding: 10px;
+    }
+    .table th {
+        background-color: #ddd;
+    }
+    @page {
+        size: a4 portrait;
+        margin: 1cm;
+    }
+    .list-unstyled {
+        padding: 0;
+        list-style: none;
+    }
+    .list-unstyled > div {
+        margin-bottom: 0.5em;
+    }
+</style>
+
+
+<div class="container">
+    <div class="invoice">
+        <div class="invoice-logo"><img src="{{logo_url}}" alt="Invoice logo" style="max-height: 40px;"></div>
+        <div class="invoice-from">
+            <div class="list-unstyled text-right">
+                <div><strong>Invoice</strong></div>
+                <div>{{ request.user.profile.full_name }}</div>
+                <div>{{ order.shipping_address.address }} {{order.shipping_address.zip_code}} </div>
+                <div>{{ order.shipping_address.city }}, {{order.shipping_address.state }}</div>
+                <div>{{order.shipping_address.country}}</div>
+            </div>
+        </div>
+        <div class="invoice-details">
+            <div class="list-unstyled">
+                <div><strong>Order</strong> #</div>
+                <div><strong>Transaction</strong> #</div>
+                <div><strong>Order Date:</strong> {{ order.created_at|date:"l, F jS, Y" }}</div>
+                <div><strong>Status:</strong> PAID</div>
+            </div>
+        </div>
+        <div class="invoice-items">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center">Description</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-center">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>
+                            <p><strong>{{ item.product.name }}</strong></p>
+                            <p>{{ item.product.desc }}</p>
+                        </td>
+                        <td class="text-center"> {{ item.quantity }} </td>
+                        <td class="text-center">$ {{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" class="text-right">Discount:</th>
+                        <th class="text-center">$ {{order.coupon.discount_price}} </th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right"> Total:</th>
+                        <th class="text-center">$ {{order.total}} </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="invoice-footer">
+            <p class="text-center">Thank you for shopping with us!</p>
+        </div>
+    </div>
+</div>

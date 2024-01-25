@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Profile(models.Model):
-    user=models.OneToOneField('auth.User',on_delete=models.CASCADE)
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
     full_name=models.CharField(max_length=50,blank=True,null=True)
     bio=models.TextField()
     is_email_verified=models.BooleanField(default=False)

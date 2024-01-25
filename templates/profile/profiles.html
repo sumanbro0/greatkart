@@ -1,0 +1,89 @@
+{% load static %}
+{% block content %}
+{% include 'alerts.html' %}
+<div id="content">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card profile-card">
+                    <div class="card-body text-center">
+                        {% if profile.avatar and profile.avatar.url %}
+                        <img class="rounded-circle mb-3" src="{{ profile.avatar.url }}" alt="{{ profile.full_name }}"
+                            width="150" height="150">
+                        {% else %}
+                        <img class="rounded-circle mb-3" src="{% static 'images/suman.jpg' %}"
+                            alt="{{ profile.full_name }}" width="150" height="150">
+                        {% endif %}
+                        <h3 class="card-title">{{ profile.full_name }}</h3>
+                        <p class="card-text">{{ profile.bio }}</p>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#profileModal">
+                            Update Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Update Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" hx-post="{% url 'update_profile' %}" hx-swap="innerHTML"
+                    hx-encoding='multipart/form-data' hx-target="#content"
+                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            {% if profile.avatar and profile.avatar.url %}
+                            <img id="currentImage" class="rounded-circle mb-3" src="{{ profile.avatar.url }}"
+                                alt="{{ profile.full_name }}" width="150" height="150">
+
+                            {% endif %}
+                            <label for="avatar">Profile Picture</label>
+                            <input type="file" class="form-control-file" id="avatar" name="avatar">
+                        </div>
+                        <div class="form-group">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name"
+                                value="{{ profile.full_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <input type="text" class="form-control" id="bio" name="bio" value="{{ profile.bio }}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (event) {
+        $('#profileModal').modal('hide');
+        $('.modal-backdrop').remove();
+    });
+    $('#profileModal').on('show.bs.modal', function (e) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#currentImage').attr('src', e.target.result);
+        }
+        var file = $('#avatar')[0].files[0];
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+        $('#avatar').val('');
+    });
+
+</script>

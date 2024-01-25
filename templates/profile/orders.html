@@ -1,0 +1,53 @@
+{% include 'alerts.html' %}
+<section class="section-content padding-y bg">
+	<div class="container">
+		{% for order in orders %}
+		<div class="card mb-4 shadow">
+			<div class="card-header bg-primary text-white">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<h4 class="mb-0">Order #{{ order.id }}</h4>
+						<span class="badge 
+							{% if order.status == 'created' %} badge-light
+							{% elif order.status == 'shipped' %} badge-info
+							{% elif order.status == 'delivered' %} badge-success
+							{% elif order.status == 'canceled' %} badge-danger
+							{% elif order.status == 'refunded' %} badge-warning
+							{% endif %}">
+							{{ order.get_status_display }}
+						</span>
+						{% if order.is_paid %}
+							<p class="mt-2 mb-0">Payment ID: <span class="badge badge-light">{{ order.payment_id }}</span></p>
+							<p class="mb-0">Payment Status: <span class="badge badge-success">PAID</span></p>
+						{% else %}
+							<p class="mb-0">Payment Status: <span class="badge badge-warning">UNPAID (PAY ON DELIVERY)</span></p>
+						{% endif %}
+					</div>
+					<div>
+						<a hx-get="{% url 'delete_order' order.id %}" class="btn btn-danger btn-sm mr-3 " hx-push-url="false" hx-boost="true" hx-target="closest main">Delete Order</a>
+						<a href="{% url 'download_invoice' order.id %}" class="btn btn-sm btn-light">Download Invoice</a>
+					</div>
+				</div>
+			</div>
+			<div class="card-body">
+				<h5 class="card-title">Items:</h5>
+				<ul class="list-group list-group-flush">
+					{% for item in order.items.all %}
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						{{ item.product_name }} - {{item.product_price}} x {{item.quantity}}
+						<span class="badge badge-primary badge-pill">${{ item.total }}</span>
+					</li>
+					{% endfor %}
+				</ul>
+				<p class="mt-3"><strong>Total: ${{ order.total }}</strong></p>
+				{% if order.coupon %}
+				<p class="text-success">Coupon applied: {{ order.coupon.coupon_code }} - ${{ order.coupon.discount_price }} off</p>
+				{% endif %}
+			</div>
+		</div>
+		{% empty %}
+		<div class="alert alert-info">You have no orders yet.</div>
+		{% endfor %}
+	</div>
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
