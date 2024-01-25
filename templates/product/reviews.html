@@ -1,0 +1,120 @@
+
+
+<div class="col-md-12  ">
+    <div class="card text-center">
+        <div class="card-body">
+            <h5 class="card-title">Average Rating</h5>
+            <span class="text-warning display-1">
+                <i class="fas fa-star fa-2x"></i>
+            </span><span class="font-weight-bold  display-4 ">({{product.get_avg_rating }})</span>
+        </div>
+    </div>
+</div>
+
+{% if request.htmx %}
+{% include 'alerts.html' %}
+{% endif %}
+
+
+<header class="section-heading d-flex  justify-content-between  ">
+
+    <h3>Customer Reviews </h3>
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addReviewModal">
+        {% if not already_reviewed %}
+        <i class="fas fa-plus"></i> Review
+        {% else %}
+        Update Review
+        {% endif %}
+    </button>
+
+
+</header>
+
+<div class="modal fade" id="addReviewModal" tabindex="-1" role="dialog" aria-labelledby="addReviewModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReviewModalLabel">Add Review</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% if not already_reviewed %}
+                <form hx-boost="true" hx-trigger="submit"  hx-post="{% url 'add_review' product.id %}" hx-swap="innerHTML" hx-target="#R" id="addReviewForm" >
+                    {% else %}
+                <form hx-boost="true" hx-trigger="submit"  hx-post="{% url 'update_review' product.id %}" hx-swap="innerHTML" hx-target="#R" id="addReviewForm" >
+                    
+                    
+                    {% endif %}
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="reviewText" class="col-form-label">Review:</label>
+                        <textarea name="comment" class="form-control"  id="reviewText">{{review.comment}}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewStars" class="col-form-label">Rating:</label>
+                        <select class="form-control" name="rating" value="{{review.rating}}" id="reviewStars">
+                            <option value="1">⭐</option>
+                            <option value="2">⭐⭐</option>
+                            <option value="3">⭐⭐⭐</option>
+                            <option value="4">⭐⭐⭐⭐</option>
+                            <option value="5">⭐⭐⭐⭐⭐</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submitReview">Submit Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for review in product.reviews.all %}
+<article class="box mb-3">
+    <div class="icontext w-100">
+        <img src="{{ review.user.profile.avatar.url }}" class="img-xs icon rounded-circle">
+        <div class="text">
+            <h6 class="mb-1">{{ review.user.profile.full_name }}
+                <span class="text-warning">
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </span>
+            </h6>
+            <span class="date text-muted ">{{ review.created_at }}</span>
+            <div class="mt-3">
+                <p>
+                    {{ review.comment }}
+                </p>
+            </div>
+        </div>
+        {% if review.user == request.user %}
+            <a style="cursor: pointer;" hx-get="{% url 'delete_review' review.id %}" hx-target="#R" hx-boost="true" 
+            hx-swap="innerHTML" class="btn btn-sm btn-danger text-white">Delete</a>
+            {% endif %}
+    </div> <!-- icontext.// -->
+</article>
+{% endfor %}
+
+{% block script %}
+<script>
+    var modal = document.querySelector('#addReviewModal')
+    document.body.addEventListener('submit', function (event) {
+        modal.style.display = 'none';
+        var backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(function(backdrop) {
+            backdrop.style.display = 'none';
+        });
+        document.body.classList.remove('modal-open');
+    });
+</script>
+{% endblock script %}

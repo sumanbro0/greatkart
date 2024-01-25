@@ -1,12 +1,14 @@
 from urllib.parse import urlencode
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from cart.models import Cart
-from .models import Category, Color, Product, Size
+from .models import Category, Color, Product, Review, Size
 from django.db.models import Avg
 from django.core.paginator import Paginator
 from django.db.models import Q
 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 # Create your views here.
 def index(request):
@@ -84,7 +86,7 @@ def store(request):
 def product_detail(request, id):
     product = Product.objects.prefetch_related("images","variants",'variants__sizes', 'variants__color',"reviews__user").get(id=id)
     cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
-    variant_ids = Cart.objects.filter(user=request.user).values_list('items__variant_product__id', flat=True)
+    variant_ids = Cart.objects.filter(user=request.user).values_list('items__variant_product__id', flat=True)   
 
     size_names=product.variants.values_list('sizes__name', flat=True).distinct()
     color_names=product.variants.values_list('color__name', flat=True).distinct()
@@ -104,8 +106,9 @@ def product_detail(request, id):
             variant=product.variants.filter(color__id=color_id).first()
     price=product.get_final_price(variant)
     in_stock=product.is_in_stock(variant)
-
-    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids}
+    review = product.reviews.filter(user=request.user)
+    already_reviewed = review.exists()
+    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids,"already_reviewed":already_reviewed,"review":review.first()}
 
 
     if variant:
@@ -113,3 +116,52 @@ def product_detail(request, id):
 
     return render(request, 'product/product_detail.html', context)
 
+@login_required
+def add_review(request, id):
+    product = Product.objects.get(id=id)
+    already_reviewed = product.reviews.filter(user=request.user).exists()
+    review=None
+    if request.method == "POST":
+        if already_reviewed:
+            messages.error(request, "You have already reviewed this product")
+        else:
+            rating = request.POST.get('rating')
+            comment = request.POST.get('comment')
+            try:
+                review=Review.objects.create(product=product, user=request.user, rating=rating, comment=comment)
+                already_reviewed=True
+                messages.success(request, "Your review has been added")
+            except Exception as e:
+                print(e)
+                messages.error(request, "Error adding review")
+
+    return render(request, 'product/reviews.html', {"product": product, "already_reviewed": already_reviewed,"review":review})
+
+@login_required
+def update_review(request, id):
+    product = Product.objects.get(id=id)
+    review = product.reviews.filter(user=request.user).first()
+
+    if request.method == "POST":
+        if not review:
+            messages.error(request, "No review to update")
+        else:
+            rating = request.POST.get('rating')
+            comment = request.POST.get('comment')
+            try:
+                review.rating = rating
+                review.comment = comment
+                review.save()
+                messages.success(request, "Your review has been updated")
+            except Exception as e:
+                print(e)
+                messages.error(request, "Error updating review")
+
+    return render(request, 'product/reviews.html', {"product": product, "review": review, "already_reviewed": True})
+
+@login_required
+def delete_review(request, id):
+    review = Review.objects.get(id=id, user=request.user)
+    review.delete()
+    messages.success(request, "Your review has been deleted")
+    return render(request,'product/reviews.html',{"product":review.product})

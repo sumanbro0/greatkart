@@ -8,7 +8,7 @@
 
 <div class="row">
     {% for product in products %}
-    <div class="col-md-5 ">
+    <div class="col-md-4 ">
         <div class="card card-product-grid">
             {% if product.images.all %}
             <a href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" class="img-wrap">
@@ -69,7 +69,7 @@
             {% if products.has_next %}
                 <li class="page-item">
                     <a class="page-link" href="?page={{ products.next_page_number }}"
-                        hx-get="/store/?{{ query_string }}&page={{ products.next_page_number }}" hx-target="#main">Next</a>
+                        hx-get="/store/?{{ query_string }}&page={{ products.next_page_number }}" hx-swap="outerHTML" hx-target="#main">Next</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><a class="page-link">Next</a></li>

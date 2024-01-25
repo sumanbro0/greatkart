@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
+
+from cart.models import Order
 from .models import Address, Profile
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileForm
@@ -89,8 +91,8 @@ def my_profile(request):
 
 @login_required
 def orders(request):
-    messages.error(request, 'This feature is not available yet.')
-    return render(request, 'profile/place-order.html')
+    order=Order.objects.filter(user=request.user)
+    return render(request, 'profile/orders.html', {'orders': order})
 
 @login_required
 def me(request):
