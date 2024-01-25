@@ -4,8 +4,11 @@ from cart.models import Cart
 def add_search_query_to_context(request):
     query = request.GET.get('query', '')
     cart=None
-    if request.user and request.user.is_authenticated and not (request.user.is_superuser or request.user.is_staff):
-        cart=Cart.objects.get(user=request.user)
+    try:
+        if request.user and request.user.is_authenticated and not (request.user.is_superuser or request.user.is_staff):
+            cart=Cart.objects.get(user=request.user)
+    except Cart.DoesNotExist:
+        pass
     cart_count=0
     if cart:
         cart_count=cart.items.all().count()

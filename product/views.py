@@ -135,7 +135,7 @@ def add_review(request, id):
                 print(e)
                 messages.error(request, "Error adding review")
 
-    return render(request, 'product/reviews.html', {"product": product, "already_reviewed": already_reviewed,"review":review})
+    return render(request, 'product/reviews.html', {"product": product, "already_reviewed": already_reviewed,"review":review,"msg":True})
 
 @login_required
 def update_review(request, id):
@@ -157,11 +157,11 @@ def update_review(request, id):
                 print(e)
                 messages.error(request, "Error updating review")
 
-    return render(request, 'product/reviews.html', {"product": product, "review": review, "already_reviewed": True})
+    return render(request, 'product/reviews.html', {"product": product, "review": review, "already_reviewed": True,"msg":True})
 
 @login_required
 def delete_review(request, id):
     review = Review.objects.get(id=id, user=request.user)
     review.delete()
     messages.success(request, "Your review has been deleted")
-    return render(request,'product/reviews.html',{"product":review.product})
+    return render(request,'product/reviews.html',{"product":review.product,"msg":True})
