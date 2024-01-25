@@ -181,6 +181,7 @@ def initiate_khalti_payment(request,cart,aid):
 
 @login_required
 def place_order(request):
+    print(request.GET)
     cart=Cart.objects.prefetch_related("items__variant_product","items__product").get(user=request.user)
     if not cart.items.exists():
         messages.error(request,"Your cart is empty.")

@@ -59,7 +59,8 @@
 				});
 			});
 		};
+
 document.body.addEventListener('htmx:afterSwap',handleSelection);
-document.addEventListener('htmx:load',handleSelection);
+document.body.addEventListener('htmx:load',handleSelection);
 </script>
 {% endblock script %}
