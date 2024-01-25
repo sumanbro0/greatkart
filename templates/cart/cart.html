@@ -72,14 +72,51 @@
 
 		<div class="card">
 		<div class="card-body">
-			<dl class="dlist-align">
-			  <dt>Total:</dt>
-			  <dd class="text-right text-dark b"><strong>${{cart.total}}</strong></dd>
-			</dl>
+			<table class="table table-borderless">
+				<tbody>
+					<tr>
+						<th scope="row">Sub Total:</th>
+						<td class="text-right">${{cart.total}}</td>
+					</tr>
+					{% if cart.coupon %}
+					<tr>
+						<th scope="row">Discount ({{ cart.coupon.coupon_code }}):</th>
+						<td class="text-right text-success">- ${{cart.coupon.discount_price}}</td>
+					</tr>
+					{% endif %}
+					<tr>
+						<th scope="row">Grand Total:</th>
+						<td class="text-right"><strong>${{cart.total_with_discount}}</strong></td>
+					</tr>
+				</tbody>
+			</table>
 			<hr>
+		<form method="get" hx-boost="true" hx-push-url="false" action="{% url 'coupon' %}">
+			{% csrf_token %}
+			<div class="input-group mb-3">
+				<input type="text" class="form-control" placeholder="Coupon code" name="coupon" required>
+				<div class="input-group-append">
+					<button class="btn btn-primary" type="submit">Apply</button>
+				</div>
+			</div>
+		</form>
+		{% if cart.coupon %}
+		<div class="alert alert-success" role="alert">
+			<strong>Coupon Applied: {{ cart.coupon.coupon_code }}</strong>
+			<a  class="close" aria-label="Close" hx-boost="true" hx-push-url="false" href="{% url 'remove_coupon' %}"">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		{% endif %}
+		<dl class="dlist-align">
+			<dt>Total:</dt>
+			<dd class="text-right text-dark b"><strong>${{cart.total}}</strong></dd>
+		</dl>
+		<hr>
 			<p class="text-center mb-3">
 				<img src="{% static 'images/misc/payments.png' %}" height="26">
 			</p>
+			<form method="post" action="#">
 			{% if cart.items.all %}
 			<a href="{% url 'checkout' %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" class="btn btn-primary btn-block"> Checkout </a>
 			{% endif %}

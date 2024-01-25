@@ -9,7 +9,7 @@ from io import BytesIO
 from profiles.models import Address
 from xhtml2pdf import pisa
 
-from .models import Cart, CartItem, Order
+from .models import Cart, CartItem, Coupon, Order
 from product.models import Product
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -66,12 +66,17 @@ def add_to_cart(request, id):
     return redirect(url+ query)
 
 
+def check_discount(cart):
+    if not (cart.coupon and cart.coupon.is_expired == False and cart.total >= cart.coupon.minimum_amount):
+        cart.coupon = None
+        cart.save()
+
 @login_required
 def remove_from_cart(request,id):
     variant_id = request.GET.get('id',None)
     color=request.GET.get('color',"")
     size=request.GET.get('size',"")
-
+    cart=Cart.objects.get(user=request.user)
     query="?color="+color+"&size="+size
     base_url=reverse('product',args=[id])
     referrer=request.META.get('HTTP_REFERER','')
@@ -89,6 +94,7 @@ def remove_from_cart(request,id):
     
     if not item.variant_product:
         item.delete()
+        check_discount(cart)
         messages.success(request, "Product variant removed from cart successfully.")
         return redirect(base_url)
 
@@ -99,6 +105,7 @@ def remove_from_cart(request,id):
     try:
         if variant_id and item.variant_product.id == int(variant_id):
             item.delete()
+            check_discount(cart)
             messages.success(request, "Product variant removed from cart successfully.")
 
         else:
@@ -242,3 +249,46 @@ def delete_order(request, order_id):
     order.delete()
     messages.success(request, 'Order deleted successfully.')
     return redirect('orders')
+
+
+@login_required
+def apply_coupon(request):
+    coupon_code=request.GET.get("coupon",None)
+    coupon=None
+
+    if not coupon_code:
+        messages.error(request,"Please enter a valid coupon code.")
+        return redirect("cart")
+    try:
+        coupon=Coupon.objects.get(coupon_code=coupon_code)
+    except Coupon.DoesNotExist:
+        messages.error(request,"Please enter a valid coupon code.")
+        return redirect("cart")
+
+    cart=Cart.objects.prefetch_related("items__variant_product","items__product").get(user=request.user)
+
+    if not cart.items.exists():
+        messages.error(request,"Your cart is empty.")
+        return redirect("cart")
+    
+    if cart.total < coupon.minimum_amount:
+        messages.error(request,"Your cart total is less than the minimum amount required for this coupon.")
+        return redirect("cart")
+    
+    if coupon.is_expired:
+        messages.error(request,"This coupon is expired.")
+        return redirect("cart")
+    
+    cart.coupon=coupon
+    cart.save()
+    messages.success(request,"Coupon applied successfully.")
+    return redirect("cart")
+    
+    
+@login_required
+def remove_coupon(request):
+    cart=Cart.objects.get(user=request.user)
+    cart.coupon=None
+    cart.save()
+    messages.success(request,"Coupon removed successfully.")
+    return redirect("cart")
