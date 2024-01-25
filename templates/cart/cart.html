@@ -92,7 +92,6 @@
 			</table>
 			<hr>
 		<form method="get" hx-boost="true" hx-push-url="false" action="{% url 'coupon' %}">
-			{% csrf_token %}
 			<div class="input-group mb-3">
 				<input type="text" class="form-control" placeholder="Coupon code" name="coupon" required>
 				<div class="input-group-append">
