@@ -23,12 +23,12 @@
 	<div class="container">
 		{% if query %}
 		<header class="section-heading">
-			<a href="{% url 'store' %}" hx-boost="true" class="btn btn-outline-primary float-right">See all products</a>
+			<a hx-indicator="#progress" href="{% url 'store' %}" hx-boost="true" class="btn btn-outline-primary float-right">See all products</a>
 			<h3 class="section-title">search result for {{ query }}</h3>
 		</header><!-- sect-heading -->
 		{% else %}
 		<header class="section-heading">
-			<a href="{% url 'store' %}" hx-boost="true" class="btn btn-outline-primary float-right">See all</a>
+			<a hx-indicator="#progress" href="{% url 'store' %}" hx-boost="true" class="btn btn-outline-primary float-right">See all</a>
 			<h3 class="section-title">Popular products</h3>
 		</header><!-- sect-heading -->
 		{% endif %}
@@ -38,20 +38,20 @@
 			<div class="col-md-3 ">
 				<div class="card card-product-grid">
 					{% if product.images.all %}
-					<a  href="{% url 'product' product.id %}" hx-boost="true"  class="img-wrap">
+					<a hx-indicator="#progress" href="{% url 'product' product.id %}" hx-boost="true"  class="img-wrap">
 						<img src="{{ product.images.all.0.image.url }}" class="card-img-top">
 					</a>
 					{% endif %}
 					<div class="card-body">
 						<h5 class="card-title">
-							<a  href="{% url 'product' product.id %}" hx-boost="true"  class="title text-primary">{{ product.name }}</a>
+							<a hx-indicator="#progress"  href="{% url 'product' product.id %}" hx-boost="true"  class="title text-primary">{{ product.name }}</a>
 						</h5>
 						<hr class="my-4">
 						<h6 class="card-subtitle mb-2 text-muted">Price</h6>
 						<p class="card-text">${{ product.base_price }}</p>
 						<div class="d-flex justify-content-around  mx-auto">
 						
-							<a href="{% url 'product' product.id %}" hx-boost="true" class="btn btn-primary mt-4">View Details</a>
+							<a hx-indicator="#progress" href="{% url 'product' product.id %}" hx-boost="true" class="btn btn-primary mt-4">View Details</a>
 						
 						
 						</div>

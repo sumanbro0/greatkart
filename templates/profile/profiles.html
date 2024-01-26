@@ -37,7 +37,7 @@
                     </button>
                 </div>
                 <form method="post" hx-post="{% url 'update_profile' %}" hx-swap="innerHTML"
-                    hx-encoding='multipart/form-data' hx-target="#content"
+                    hx-encoding='multipart/form-data' hx-target="#content" hx-indicator="#progress"
                     hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="form-group">

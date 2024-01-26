@@ -9,7 +9,7 @@
 	<div class="card mx-auto shadow-lg " style="max-width: 380px; margin-top:100px;">
       <div class="card-body">
       <h4 class="card-title mb-4">Sign in</h4>
-      <form method="post">
+      <form method="post" hx-boost="true" hx-indicator="#progress">
         {% csrf_token %}
           <div class="form-group">
 			 <input type="email" name="email" class="form-control" placeholder="Email Address" >
@@ -29,7 +29,7 @@
       </div> <!-- card-body.// -->
     </div> <!-- card .// -->
 
-	<p class="text-center mt-4">Don't have account? <a href="{% url 'signup' %}">Sign up</a></p>
+	<p class="text-center mt-4">Don't have account? <a hx-boost="true" hx-indicator="#progress" href="{% url 'signup' %}">Sign up</a></p>
      <br><br>
 <!-- ============================ COMPONENT LOGIN  END.// ================================= -->
 

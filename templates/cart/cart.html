@@ -91,7 +91,7 @@
 				</tbody>
 			</table>
 			<hr>
-		<form method="get" hx-boost="true" hx-push-url="false" action="{% url 'coupon' %}">
+		<form method="get" hx-boost="true" hx-push-url="false" hx-indicator="#progress" action="{% url 'coupon' %}">
 			<div class="input-group mb-3">
 				<input type="text" class="form-control" placeholder="Coupon code" name="coupon" required>
 				<div class="input-group-append">
@@ -102,7 +102,7 @@
 		{% if cart.coupon %}
 		<div class="alert alert-success" role="alert">
 			<strong>Coupon Applied: {{ cart.coupon.coupon_code }}</strong>
-			<a  class="close" aria-label="Close" hx-boost="true" hx-push-url="false" href="{% url 'remove_coupon' %}"">
+			<a  class="close" aria-label="Close" hx-boost="true" hx-indicator="#progress" hx-push-url="false" href="{% url 'remove_coupon' %}"">
 				<span aria-hidden="true">&times;</span>
 			</a>
 		</div>
@@ -115,11 +115,10 @@
 			<p class="text-center mb-3">
 				<img src="{% static 'images/misc/payments.png' %}" height="26">
 			</p>
-			<form method="post" action="#">
 			{% if cart.items.all %}
-			<a href="{% url 'checkout' %}" hx-boost="true" hx-target="body" hx-swap="outerHTML" class="btn btn-primary btn-block"> Checkout </a>
+			<a href="{% url 'checkout' %}" hx-indicator="#progress" hx-boost="true" hx-target="body" hx-swap="outerHTML" class="btn btn-primary btn-block"> Checkout </a>
 			{% endif %}
-			<a href="{% url 'home' %}" hx-boost="true" class="btn btn-light btn-block">Continue Shopping</a>
+			<a href="{% url 'home' %}" hx-indicator="#progress" hx-boost="true" class="btn btn-light btn-block">Continue Shopping</a>
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
 

@@ -27,7 +27,7 @@
             <p class="text-center mb-3">
                 <img src="{% static '/images/misc/payments.png' %}" height="26">
             </p>
-            <form action="{% url 'place_order' %}" hx-boost="true" method="get" >
+            <form hx-indicator="#progress" action="{% url 'place_order' %}" hx-boost="true" method="get" >
             <article class="py-3 ">
             
                 <div class="card">

@@ -42,9 +42,9 @@
             </div>
             <div class="modal-body">
                 {% if not already_reviewed %}
-                <form hx-boost="true" hx-trigger="submit"  hx-post="{% url 'add_review' product.id %}" hx-swap="innerHTML" hx-target="#R" id="addReviewForm" >
+                <form hx-indicator="#progress" hx-boost="true" hx-trigger="submit"  hx-post="{% url 'add_review' product.id %}" hx-swap="innerHTML" hx-target="#R" id="addReviewForm" >
                     {% else %}
-                <form hx-boost="true" hx-trigger="submit"  hx-post="{% url 'update_review' product.id %}" hx-swap="innerHTML" hx-target="#R" id="addReviewForm" >
+                <form hx-indicator="#progress" hx-boost="true" hx-trigger="submit"  hx-post="{% url 'update_review' product.id %}" hx-swap="innerHTML" hx-target="#R" id="addReviewForm" >
                     
                     
                     {% endif %}
@@ -101,7 +101,7 @@
             </div>
         </div>
         {% if review.user == request.user %}
-            <a style="cursor: pointer;" hx-get="{% url 'delete_review' review.id %}" hx-target="#R" hx-boost="true" 
+            <a hx-indicator="#progress" style="cursor: pointer;" hx-get="{% url 'delete_review' review.id %}" hx-target="#R" hx-boost="true" 
             hx-swap="innerHTML" class="btn btn-sm btn-danger text-white">Delete</a>
             {% endif %}
     </div> <!-- icontext.// -->

@@ -24,7 +24,7 @@
 						{% endif %}
 					</div>
 					<div>
-						<a hx-get="{% url 'delete_order' order.id %}" class="btn btn-danger btn-sm mr-3 " hx-push-url="false" hx-boost="true" hx-target="closest main">Delete Order</a>
+						<a hx-indicator="#progress" hx-get="{% url 'delete_order' order.id %}" class="btn btn-danger btn-sm mr-3 " hx-push-url="false" hx-boost="true" hx-target="closest main">Delete Order</a>
 						<a href="{% url 'download_invoice' order.id %}" class="btn btn-sm btn-light">Download Invoice</a>
 					</div>
 				</div>
