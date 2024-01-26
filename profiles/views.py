@@ -74,8 +74,7 @@ def update_profile(request):
         profile.full_name = request.POST.get('full_name')
         profile.bio = request.POST.get('bio')
         profile.save()
-        # profile/profile_html = render_to_string('profile/profiles.html', {'profile': profile}, request=request)
-        # return HttpResponse(profile/profile_html)
+
         return render(request, 'profile/profiles.html', {'profile': profile})
     return redirect('me')
     
@@ -86,7 +85,10 @@ def my_profile(request):
     if created:
         profile.full_name=request.user.first_name + ' ' + request.user.last_name
         profile.save()
-    return render(request, 'profile/profiles.html', {'profile': profile})
+    htmx=False
+    if request.htmx:
+        htmx=True
+    return render(request, 'profile/profiles.html', {'profile': profile,'htmx':htmx})
 
 
 @login_required

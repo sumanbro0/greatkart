@@ -26,57 +26,48 @@ document.addEventListener('DOMContentLoaded', handleEvents);
 document.body.addEventListener('htmx:afterOnload', handleEvents);
 
 
-    window.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('a[data-state]').forEach(function (link) {
-            link.addEventListener('click', function () {
-                document.querySelectorAll('a[data-state]').forEach(function (link) {
-                    link.classList.remove('active');
-                });
+	document.querySelectorAll('a[data-state]').forEach(function (link) {
+		link.addEventListener('click', function () {
+			document.querySelectorAll('a[data-state]').forEach(function (link) {
+				link.classList.remove('active');
+			});
 
-                this.classList.add('active');
+			this.classList.add('active');
 
-                sessionStorage.setItem('state', this.getAttribute('data-state'));
-            });
-        });
+			sessionStorage.setItem('state', this.getAttribute('data-state'));
+		});
+	});
 
-        var logoutLink = document.getElementById('logout-link');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', function () {
-                sessionStorage.clear();
-            });
-        }
+	var logoutLink = document.getElementById('logout-link');
+	if (logoutLink) {
+		logoutLink.addEventListener('click', function () {
+			sessionStorage.clear();
+		});
+	}
 
-        var state = sessionStorage.getItem('state');
+function handleState() {
+    var state = sessionStorage.getItem('state');
+    var linkSelector = state ? `a[data-state="${state}"]` : 'a[data-state]';
+    var link = document.querySelector(linkSelector);
+    if (link) {
         if (state) {
-            var link = document.querySelector(`a[data-state="${state}"]`);
-            if (link) {
-                link.click();
-                link.classList.add('active');
-            }
-        } else {
-            var firstLink = document.querySelector('a[data-state]');
-            if (firstLink) {
-                firstLink.classList.add('active');
-            }
+            link.click();
         }
+        link.classList.add('active');
+    }
+}
 
-        document.body.addEventListener('htmx:afterSwap', function (event) {
-            if ($('.modal').hasClass('in')) {
-                $('body').addClass('modal-open');
-            } else {
-                $('body').removeClass('modal-open');
-                $('body').css('padding-right', '0');
-            }
-        });
-    });
+window.addEventListener('htmx:onLoad', handleState);
+window.addEventListener('DOMContentLoaded', handleState);
 
-
-
-
-
-
-
-
+	document.body.addEventListener('htmx:afterSwap', function (event) {
+		if ($('.modal').hasClass('in')) {
+			$('body').addClass('modal-open');
+		} else {
+			$('body').removeClass('modal-open');
+			$('body').css('padding-right', '0');
+		}
+	});
 
 
 
