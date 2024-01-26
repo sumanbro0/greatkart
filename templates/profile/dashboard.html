@@ -18,11 +18,7 @@
 		color: blue;
 	}
 </style>
-<div id="loading-spinner" style="display: none;">
-	<div class="spinner-border text-primary" role="status">
-		<span class="sr-only">Loading...</span>
-	</div>
-</div>
+
 <div class="container">
 	<div class="row">
 		<aside class="col-md-4 py-5 ">
@@ -53,12 +49,11 @@
 			</ul>
 		</aside>
 		<main id="content" class="col-md-8 mt-4">
-			{% include 'spinner.html' %}
 		</main>
 	</div>
 </div>
 {% endblock content %}
-{% block script %}
+<!-- {% block script %}
 <script>
 	document.querySelectorAll('a[data-state]').forEach(function (link) {
 		link.addEventListener('click', function () {
@@ -104,4 +99,4 @@
 		}
 	});
 </script>
-{% endblock script %}
+{% endblock script %} -->
