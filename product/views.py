@@ -131,6 +131,11 @@ def product_detail(request, id):
     in_stock=product.is_in_stock(variant)
     context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids,"already_reviewed":already_reviewed,"is_in_wishlist":is_in_wishlist}
 
+    if size_id:
+        context['size_id']=int(size_id)
+    if color_id:
+        context['color_id']=int(color_id)
+
     if review:
         context['review']=review.first()
 

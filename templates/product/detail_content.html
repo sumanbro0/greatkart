@@ -41,7 +41,7 @@
         </p>
     </div>
     <hr>
-    <form hx-indicator="#progress" hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-push-url="false" hx-target="body"
+    <form hx-boost="true" hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-target="body"
 
         hx-swap="innerHTML" id="productForm">
         {% if colors %}
@@ -70,7 +70,6 @@
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
                     {% for size in sizes %}
                     {% with request.GET.size|add:0 as size_id %}
-                    <!-- convert size_id to integer -->
 
                     <label hx-push-url="false" class="btn btn-light  {% if size.id  ==  size_id %} active {% endif %} ">
                         <input type="radio" name="size" value="{{size.id}}" {% if size.id == size_id %} checked {% endif %}>
