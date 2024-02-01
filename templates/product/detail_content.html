@@ -95,4 +95,16 @@
     class="btn text-white btn-danger"> <span class="text">Remove from cart</span>
         <i class="fas fa-shopping-cart"></i> </button>
     {% endif %}
+
+    {% if is_in_wishlist %}
+    <a hx-boost="true" href="{% url 'remove_from_wishlist' product.id %}" class="btn btn-danger btn-md">
+        <i class="fa fa-heart"></i>
+    </a>
+    {% else %}
+    <a hx-boost="true" href="{% url 'add_to_wishlist' product.id %}" class="btn btn-secondary btn-md">
+        <i class="fa fa-heart"></i>
+    </a>
+    {% endif %}
+    </div>
+
 </article>

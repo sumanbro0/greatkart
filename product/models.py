@@ -112,3 +112,29 @@ class Review(models.Model):
 
     def __str__(self):
         return self.product.name
+    
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey('auth.User', related_name='wishlist', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    share_token = models.CharField(max_length=255, blank=True)
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.user.profile.full_name
+    
+
+class WishlistItem(models.Model):
+    wishlist = models.ForeignKey(Wishlist, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='wishlist_items', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        unique_together = ('product', 'wishlist')
+
+    def __str__(self):
+        return self.product.name
+    

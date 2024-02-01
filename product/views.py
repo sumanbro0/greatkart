@@ -1,8 +1,11 @@
+import secrets
 from urllib.parse import urlencode
 from django.shortcuts import redirect, render
+from django.http import HttpResponse
+from django.urls import reverse
 
 from cart.models import Cart
-from .models import Category, Color, Product, Review, Size
+from .models import Category, Color, Product, Review, Size, Wishlist, WishlistItem
 from django.db.models import Avg
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -13,7 +16,8 @@ from django.contrib import messages
 # Create your views here.
 def index(request):
     products = Product.objects.prefetch_related("images").annotate(average_rating=Avg('reviews__rating')).order_by('-average_rating')[:5]  
-    return render(request, 'product/index.html',{"products":products})
+    wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
+    return render(request, 'product/index.html',{"products":products,"wishlist":wishlist_ids})
 
 def search_suggestions(request):
     query = request.GET.get('query', '')
@@ -55,6 +59,8 @@ def store(request):
     products = paginator.get_page(page_number)
     n = products_list.count()
 
+    wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
+
     categories = Category.objects.all()
     sizes = Size.objects.all()
     ma=max(Product.objects.all().values_list('base_price', flat=True))
@@ -63,7 +69,7 @@ def store(request):
     price_options = list(frange(mi, ma + step, step))
     query_params = request.GET.copy()
 
-    query_params.pop('page', None)
+    page=query_params.pop('page', None)
 
     base_query_string = query_params.urlencode()
     context = {
@@ -74,10 +80,11 @@ def store(request):
         'n': n,
         'query_string': base_query_string,  # Add this line
         'cart_ids':cart_ids,
+        'wishlist':wishlist_ids,
     }
     referrer = request.META.get('HTTP_REFERER', '')
 
-    if request.htmx and "store" in referrer:
+    if request.htmx and "store" in referrer and (base_query_string or page):
         return render(request, 'product/products_list.html', context)
 
     return render(request, 'product/store.html', context)
@@ -94,6 +101,7 @@ def product_detail(request, id):
     colors=Color.objects.filter(name__in=color_names)
     size_id=request.GET.get('size')
     color_id=request.GET.get('color')
+    is_in_wishlist=WishlistItem.objects.filter(wishlist__user=request.user,product=product).exists()
     
     variant=None
     if colors and sizes:
@@ -108,7 +116,7 @@ def product_detail(request, id):
     in_stock=product.is_in_stock(variant)
     review = product.reviews.filter(user=request.user)
     already_reviewed = review.exists()
-    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids,"already_reviewed":already_reviewed,"review":review.first()}
+    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids,"already_reviewed":already_reviewed,"review":review.first(),"is_in_wishlist":is_in_wishlist}
 
 
     if variant:
@@ -165,3 +173,59 @@ def delete_review(request, id):
     review.delete()
     messages.success(request, "Your review has been deleted")
     return render(request,'product/reviews.html',{"product":review.product,"msg":True})
+
+
+
+@login_required
+def wishlist(request):
+    wishlist = Wishlist.objects.get_or_create(user=request.user)
+    products=wishlist[0].items.all()
+    wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
+    return render(request, 'product/wishlist.html', {"products": products})
+
+
+@login_required
+def add_to_wishlist(request, id):
+    product = Product.objects.get(id=id)
+    referrer=request.META.get('HTTP_REFERER','')
+    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+    item,created=WishlistItem.objects.get_or_create(wishlist=wishlist, product=product)
+    if created:
+        messages.success(request, "Added to wishlist")
+        return redirect(referrer)   
+
+    messages.warning(request, "Already in wishlist wishlist")
+    return redirect(referrer)
+
+
+@login_required
+def remove_from_wishlist(request, id):
+    product = Product.objects.get(id=id)
+    wishlist = Wishlist.objects.get(user=request.user)
+    item = WishlistItem.objects.get(wishlist=wishlist, product=product)
+    item.delete()
+    referrer=request.META.get('HTTP_REFERER','')
+    messages.success(request, "Removed from wishlist")
+    return redirect(referrer)
+
+
+@login_required
+def generate_share_link(request):
+    wishlist = Wishlist.objects.get(user=request.user)
+
+    if wishlist.share_token:
+        share_link = request.build_absolute_uri(reverse('view_wishlist', args=[wishlist.share_token]))
+        print(share_link)
+    else:
+        token = secrets.token_urlsafe(16)
+        wishlist.share_token = token
+        wishlist.save()
+        share_link = request.build_absolute_uri(reverse('view_wishlist', args=[token]))
+
+    return HttpResponse(share_link, content_type='text/plain')
+    
+
+def view_wishlist(request, id):
+    wishlist = Wishlist.objects.get(share_token=id)
+    products = wishlist.items.all()
+    return render(request, 'product/wishlist.html', {"products": products,'shared':True})

@@ -10,5 +10,9 @@ urlpatterns = [
     path('add_review/<int:id>', views.add_review, name='add_review'),
     path('delete_review/<int:id>', views.delete_review, name='delete_review'),
     path('update_review/<int:id>', views.update_review, name='update_review'),
-    
-]
+    path('wishlist/', views.wishlist, name='wishlist'),
+    path('add_to_wishlist/<int:id>', views.add_to_wishlist, name='add_to_wishlist'),
+    path('remove_from_wishlist/<int:id>', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('generate_share_link/', views.generate_share_link, name='generate_share_link'),
+    path('view_wishlist/<str:id>', views.view_wishlist, name='view_wishlist'),
+    ]

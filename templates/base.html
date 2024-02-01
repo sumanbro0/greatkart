@@ -37,7 +37,7 @@
 	</div>
 
 	<header class="section-header">
-		<nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom">
+		<nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom" style="background-color: #f8f9fa;">
 			<div class="container">
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop4"
 					aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,11 +64,8 @@
 							</a>
 						</li>
 					</ul>
-					<!-- list-inline //  -->
 				</div>
-				<!-- navbar-collapse .// -->
 			</div>
-			<!-- container //  -->
 		</nav>
 
 		<section class="header-main border-bottom">
@@ -111,23 +108,21 @@
 					</div>
 					<!-- col.// -->
 					<div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
-						<div class="d-flex justify-content-end mb-3 mb-lg-0">
-							<div class="widget-header">
+						<nav class="d-flex justify-content-end mb-3 mb-lg-0">
+							<section class="widget-header">
 								{% if request.user.is_authenticated %}
-								<small class="title text-muted">Welcome, {{ request.user.first_name }}
-									{{ request.user.last_name }}!</small>
+								<small class="title text-muted">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}!</small>
 								<div class="d-flex align-items-center">
-									<a href="{% url 'me' %}" hx-indicator="#progress"   hx-boost="true" >
+									<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
 										{% if request.user.profile.avatar and request.user.profile.avatar.url %}
 										<img src="{{ request.user.profile.avatar.url }}"
-											alt="{{ request.user.first_name }}" class="rounded-circle" width="30"
-											height="30" />
+											alt="Avatar of {{ request.user.first_name }}" class="rounded-circle" width="30" height="30" />
 										{% else %}
-										<img src="{% static 'images/suman.jpg' %}" alt="{{ request.user.first_name }}"
+										<img src="{% static 'images/suman.jpg' %}" alt="Default avatar"
 											class="rounded-circle" width="30" height="30" />
 										{% endif %}
 									</a>
-									<a  href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true" class="ml-2">Profile</a>
+									<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true" class="ml-2">Profile</a>
 								</div>
 								{% else %}
 								<small class="title text-muted">Welcome guest!</small>
@@ -137,15 +132,21 @@
 									<a hx-boost="true" hx-swap="body" href="{% url 'signup' %}"> Register</a>
 								</div>
 								{% endif %}
+							</section>
+							<div class="d-flex align-items-center">
+								<a href="{% url 'wishlist' %}" hx-indicator="#progress" hx-boost="true" class="widget-header pl-3 ml-3">
+									<div class="icon icon-sm rounded-circle border">
+										<i class="fa fa-heart"></i>
+									</div>
+								</a>
+								<a href="{% url 'cart' %}" hx-indicator="#progress" hx-boost="true" class="widget-header pl-3 ml-3">
+									<div class="icon icon-sm rounded-circle border">
+										<i class="fa fa-shopping-cart"></i>
+									</div>
+									<span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
+								</a>
 							</div>
-							<a href="{% url 'cart' %}" hx-indicator="#progress" hx-boost="true" class="widget-header pl-3 ml-3">
-								<div class="icon icon-sm rounded-circle border">
-									<i class="fa fa-shopping-cart"></i>
-								</div>
-								<span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
-							</a>
-						</div>
-						<!-- widgets-wrap.// -->
+						</nav>
 					</div>
 					<!-- col.// --><!-- widgets-wrap.// -->
 				</div>
