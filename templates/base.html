@@ -113,7 +113,7 @@
 								{% if request.user.is_authenticated %}
 								<small class="title text-muted">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}!</small>
 								<div class="d-flex align-items-center">
-									<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
+									<a  href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
 										{% if request.user.profile.avatar and request.user.profile.avatar.url %}
 										<img src="{{ request.user.profile.avatar.url }}"
 											alt="Avatar of {{ request.user.first_name }}" class="rounded-circle" width="30" height="30" />

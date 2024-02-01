@@ -16,7 +16,9 @@ from django.contrib import messages
 # Create your views here.
 def index(request):
     products = Product.objects.prefetch_related("images").annotate(average_rating=Avg('reviews__rating')).order_by('-average_rating')[:5]  
-    wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
+    wishlist_ids=[]
+    if request.user.is_authenticated:
+        wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
     return render(request, 'product/index.html',{"products":products,"wishlist":wishlist_ids})
 
 def search_suggestions(request):
@@ -38,7 +40,7 @@ def store(request):
     query=request.GET.get('query')
     
     products_list = Product.objects.all()
-    cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
+   
 
     if category_ids:
         products_list = products_list.filter(category__id__in=category_ids)
@@ -58,8 +60,11 @@ def store(request):
     page_number = request.GET.get('page')
     products = paginator.get_page(page_number)
     n = products_list.count()
-
-    wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
+    wishlist_ids=[]
+    cart_ids=[]
+    if request.user.is_authenticated:
+        wishlist_ids=WishlistItem.objects.filter(wishlist__user=request.user).values_list('product__id',flat=True)
+        cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
 
     categories = Category.objects.all()
     sizes = Size.objects.all()
@@ -92,8 +97,9 @@ def store(request):
 
 def product_detail(request, id):
     product = Product.objects.prefetch_related("images","variants",'variants__sizes', 'variants__color',"reviews__user").get(id=id)
-    cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
-    variant_ids = Cart.objects.filter(user=request.user).values_list('items__variant_product__id', flat=True)   
+    cart_ids=[]
+    variant_ids=[]
+     
 
     size_names=product.variants.values_list('sizes__name', flat=True).distinct()
     color_names=product.variants.values_list('color__name', flat=True).distinct()
@@ -101,8 +107,17 @@ def product_detail(request, id):
     colors=Color.objects.filter(name__in=color_names)
     size_id=request.GET.get('size')
     color_id=request.GET.get('color')
-    is_in_wishlist=WishlistItem.objects.filter(wishlist__user=request.user,product=product).exists()
-    
+    is_in_wishlist=False
+    review=None
+    already_reviewed=False
+
+    if request.user.is_authenticated:
+        is_in_wishlist=WishlistItem.objects.filter(wishlist__user=request.user,product=product).exists()
+        cart_ids=Cart.objects.filter(user=request.user).values_list('items__product__id',flat=True)
+        variant_ids = Cart.objects.filter(user=request.user).values_list('items__variant_product__id', flat=True)  
+        review = product.reviews.filter(user=request.user)
+        already_reviewed = review.exists()
+
     variant=None
     if colors and sizes:
         if size_id and color_id:
@@ -114,10 +129,10 @@ def product_detail(request, id):
             variant=product.variants.filter(color__id=color_id).first()
     price=product.get_final_price(variant)
     in_stock=product.is_in_stock(variant)
-    review = product.reviews.filter(user=request.user)
-    already_reviewed = review.exists()
-    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids,"already_reviewed":already_reviewed,"review":review.first(),"is_in_wishlist":is_in_wishlist}
+    context={"product":product,"sizes":sizes,"colors":colors,"price":price,"in_stock":in_stock,"cart_ids":cart_ids,"variant_ids":variant_ids,"already_reviewed":already_reviewed,"is_in_wishlist":is_in_wishlist}
 
+    if review:
+        context['review']=review.first()
 
     if variant:
         context['variant'] = variant.id
