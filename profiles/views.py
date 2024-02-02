@@ -45,6 +45,15 @@ def signup_view(request):
 
 
 def login_view(request):
+    referrer=request.META.get('HTTP_REFERER',None)
+    print(referrer)
+
+    querystring=request.GET.urlencode()
+    print(querystring)
+    
+    if referrer and not ('users' in referrer  or referrer == 'http://127.0.0.1:8000/'):
+        return HttpResponse(f"<script>window.location.href='/users/login/?{querystring}';</script>")
+
     if request.method == 'POST':
         username = request.POST.get('email')
         password = request.POST.get('password')
@@ -52,6 +61,9 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'You have successfully logged in.')
+            if querystring:
+                next_url = request.GET.get('next', 'home')  
+                return redirect(next_url) 
             return redirect('home')
         else:
             messages.error(request, 'Invalid username or password.')

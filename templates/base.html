@@ -72,17 +72,17 @@
 			<div class="container">
 				<div class="row align-items-center">
 					<div class="col-lg-2 col-md-3 col-6">
-						<a  hx-boost="true" hx-indicator="#progress" href="{% url 'home' %}" class="brand-wrap">
+						<a hx-indicator="#progress" hx-boost="true" hx-indicator="#progress" href="{% url 'home' %}" class="brand-wrap">
 							<img class="logo" src="{% static './images/logo.png' %}" />
 						</a>
 						<!-- brand-wrap.// -->
 					</div>
 
 					<!-- col.// -->
-					<a href="{% url 'store' %}" hx-indicator="#progress" hx-boost="true" class="btn btn-outline-primary">Store</a>
+					<a hx-indicator="#progress" href="{% url 'store' %}" hx-indicator="#progress" hx-boost="true" class="btn btn-outline-primary">Store</a>
 					<div class="col-lg col-md-6 col-sm-12 col">
 						{% url 'store' as store_url %}
-						<form hx-boost="true" id="searchForm" hx-indicator="#progress" action="{% url 'store' %}" class="search" hx-get="{% url 'store' %}" hx-target="{% if request.path == store_url %}#main{% else %}body{% endif %}" hx-swap="outerHTML" hx-trigger="submit" hx-push-url="true">
+						<form  hx-boost="true" id="searchForm" hx-indicator="#progress" action="{% url 'store' %}" class="search" hx-get="{% url 'store' %}" hx-target="{% if request.path == store_url %}#main{% else %}body{% endif %}" hx-swap="outerHTML" hx-trigger="submit" hx-push-url="true">
 							<div class="position-relative" style="overflow: visible;">
 								<div class="input-group mb-0">
 									<!-- search query from context processors -->
@@ -113,7 +113,7 @@
 								{% if request.user.is_authenticated %}
 								<small class="title text-muted">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}!</small>
 								<div class="d-flex align-items-center">
-									<a  href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
+									<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
 										{% if request.user.profile.avatar and request.user.profile.avatar.url %}
 										<img src="{{ request.user.profile.avatar.url }}"
 											alt="Avatar of {{ request.user.first_name }}" class="rounded-circle" width="30" height="30" />

@@ -8,16 +8,16 @@
 
 <div class="row">
     {% for product in products %}
-    <div class="col-md-3 mb-4">
+    <div class="col-md-4 mb-4">
         <div class="card card-product-grid h-100">
             {% if product.images.all %}
-            <a hx-indicator="#progress" href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" class="img-wrap">
+            <a href="{% url 'product' product.id %}" hx-boost="true" hx-target="body" class="img-wrap">
                 <img src="{{ product.images.all.0.image.url }}" class="card-img-top">
             </a>
             {% endif %}
             <div class="card-body d-flex flex-column">
                 <h5 class="card-title">
-                    <a hx-indicator="#progress" href="{% url 'product' product.id %}" hx-boost="true" hx-get="{% url 'product' product.id %}"
+                    <a href="{% url 'product' product.id %}" hx-boost="true" hx-get="{% url 'product' product.id %}"
                         class="title text-primary">{{ product.name }}</a>
                 </h5>
                 <hr class="my-4">

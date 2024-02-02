@@ -26,6 +26,7 @@
 </script>
 {% endblock script %}
 
+
 <article class="content-body">
     <div id="c">
         <h2 class="title">{{ product.name }}</h2>
@@ -41,8 +42,7 @@
         </p>
     </div>
     <hr>
-    <form hx-boost="true" hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-target="body"
-
+    <form  hx-get="{% url 'product' product.id %}" hx-trigger="submit" hx-push-url="false" hx-target="body"
         hx-swap="innerHTML" id="productForm">
         {% if colors %}
         <div class="row">
@@ -51,9 +51,7 @@
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
                     {% for color in colors %}
                     {% with request.GET.color|add:0 as color_id %}
-                    <!-- |add:0 converts color_id to integer -->
-
-                    <label hx-push-url="false" class="btn btn-light {% if color.id  ==  color_id %} active {% endif %} ">
+                    <label class="btn btn-light {% if color.id  ==  color_id %} active {% endif %} ">
                         <input type="radio" name="color" value="{{color.id}}" {% if color.id == color_id %} checked {%  endif %}>
                         {{ color.name }}
                     </label>
@@ -96,11 +94,11 @@
     {% endif %}
 
     {% if is_in_wishlist %}
-    <a hx-indicator="#progress" hx-boost="true" href="{% url 'remove_from_wishlist' product.id %}" class="btn btn-danger btn-md">
+    <a hx-boost="true" hx-target="body" href="{% url 'remove_from_wishlist' product.id %}" class="btn btn-danger btn-md">
         <i class="fa fa-heart"></i>
     </a>
     {% else %}
-    <a hx-indicator="#progress" hx-boost="true" href="{% url 'add_to_wishlist' product.id %}" class="btn btn-secondary btn-md">
+    <a hx-boost="true" hx-target="body" href="{% url 'add_to_wishlist' product.id %}" class="btn btn-secondary btn-md">
         <i class="fa fa-heart"></i>
     </a>
     {% endif %}
