@@ -36,126 +36,93 @@
 		<div class="indeterminate" style="background-color: red;"></div>
 	</div>
 
-	<header class="section-header">
-		<nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom" style="background-color: #f8f9fa;">
-			<div class="container">
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop4"
-					aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarTop4">
-					<ul class="navbar-nav mr-auto">
-						<li class="nav-item dropdown">
-							<a href="#" class="nav-link"> English </a>
-						</li>
-						<li class="nav-item dropdown">
-							<a href="#" class="nav-link"> USD </a>
-						</li>
-					</ul>
-					<ul class="navbar-nav">
-						<li>
-							<a href="#" class="nav-link">
-								<i class="fa fa-envelope"></i> Email
-							</a>
-						</li>
-						<li>
-							<a href="#" class="nav-link">
-								<i class="fa fa-phone"></i> Call us
-							</a>
-						</li>
-					</ul>
+	<header class="section-header shadow-lg  w-100 py-3">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-12 col-md-2 text-center mb-3 mb-md-0">
+					<a hx-indicator="#progress" hx-boost="true" href="{% url 'home' %}" class="brand-wrap">
+						<img class="logo" src="{% static './images/logo.png' %}" alt="GreatKart Logo" />
+					</a>
 				</div>
-			</div>
-		</nav>
-
-		<section class="header-main border-bottom">
-			<div class="container">
-				<div class="row align-items-center">
-					<div class="col-lg-2 col-md-3 col-6">
-						<a hx-indicator="#progress" hx-boost="true" hx-indicator="#progress" href="{% url 'home' %}" class="brand-wrap">
-							<img class="logo" src="{% static './images/logo.png' %}" />
-						</a>
-						<!-- brand-wrap.// -->
-					</div>
-
-					<!-- col.// -->
-					<a hx-indicator="#progress" href="{% url 'store' %}" hx-indicator="#progress" hx-boost="true" class="btn btn-outline-primary">Store</a>
-					<div class="col-lg col-md-6 col-sm-12 col">
-						{% url 'store' as store_url %}
-						<form  hx-boost="true" id="searchForm" hx-indicator="#progress" action="{% url 'store' %}" class="search" hx-get="{% url 'store' %}" hx-target="{% if request.path == store_url %}#main{% else %}body{% endif %}" hx-swap="outerHTML" hx-trigger="submit" hx-push-url="true">
-							<div class="position-relative" style="overflow: visible;">
-								<div class="input-group mb-0">
-									<!-- search query from context processors -->
-									<input hx-boost="true" type="text" class="form-control" placeholder="Search" name="query"
-										value="{{ search_query }}" hx-get="{% url 'search' %}"
-										hx-trigger="input delay:1000ms" 
-										hx-target="#search-suggestions" 
-										hx-push-url="false" hx-swap="outerHTML" autocomplete="off" />
-									<div class="input-group-append">
-										<button class="btn btn-primary" type="submit">
-											<i class="fa fa-search"></i>
-										</button>
-									</div>
-								</div>
-								<div id="search-suggestions"
-									class="border border-primary rounded position-absolute bg-white w-100 z-index-1000 p-0"
-									style="position: absolute;"></div>
-								<div id="loading-indicator" class="position-absolute" style="display: none;"><i
-										class="fa fa-spinner fa-spin"></i> Loading...</div>
+				<div class="col-12 col-md-5 d-md-flex d-lg-flex justify-content-between   text-center mb-3 mb-md-0">
+					<a hx-indicator="#progress" href="{% url 'store' %}" hx-indicator="#progress" hx-boost="true"
+						class="btn btn-outline-primary mb-2 d-none d-lg-block">Store</a>
+					{% url 'store' as store_url %}
+					<form hx-boost="true" id="searchForm" hx-indicator="#progress" action="{% url 'store' %}" class="search col-md-12 "
+						hx-get="{% url 'store' %}"
+						hx-target="{% if request.path == store_url %}#main{% else %}body{% endif %}" hx-swap="outerHTML"
+						hx-trigger="submit" hx-push-url="true">
+						<div class="input-group">
+							<input hx-boost="true" type="text" class="form-control col-md-auto  " placeholder="Search" name="query"
+								value="{{ search_query }}" hx-get="{% url 'search' %}" hx-trigger="input delay:1000ms"
+								hx-target="#search-suggestions" hx-push-url="false" hx-swap="outerHTML"
+								autocomplete="off" />
+							<div class="input-group-append">
+								<button class="btn btn-primary" type="submit">
+									<i class="fa fa-search"></i>
+								</button>
 							</div>
-						</form>
-						<!-- search-wrap .end// -->
-					</div>
-					<!-- col.// -->
-					<div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
-						<nav class="d-flex justify-content-end mb-3 mb-lg-0">
-							<section class="widget-header">
-								{% if request.user.is_authenticated %}
-								<small class="title text-muted">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}!</small>
-								<div class="d-flex align-items-center">
-									<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
-										{% if request.user.profile.avatar and request.user.profile.avatar.url %}
-										<img src="{{ request.user.profile.avatar.url }}"
-											alt="Avatar of {{ request.user.first_name }}" class="rounded-circle" width="30" height="30" />
-										{% else %}
-										<img src="{% static 'images/suman.jpg' %}" alt="Default avatar"
-											class="rounded-circle" width="30" height="30" />
-										{% endif %}
-									</a>
-									<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true" class="ml-2">Profile</a>
-								</div>
-								{% else %}
-								<small class="title text-muted">Welcome guest!</small>
-								<div>
-									<a hx-boost="true" hx-indicator="#progress" hx-swap="body" href="{% url 'login' %}">Sign in</a>
-									<span class="dark-transp"> | </span>
-									<a hx-boost="true" hx-swap="body" href="{% url 'signup' %}"> Register</a>
-								</div>
-								{% endif %}
-							</section>
+						</div>
+						<div id="search-suggestions"
+							class="border-0  rounded position-absolute bg-white w-100 z-index-1000 p-0"
+							style="position: absolute;"></div>
+						<div id="loading-indicator" class="position-absolute" style="display: none;"><i
+								class="fa fa-spinner fa-spin"></i> Loading...</div>
+					</form>
+				</div>
+				<div class="col-12 col-md-5 text-center">
+					<nav class="d-flex justify-content-center align-items-center">
+						<section class="widget-header">
+							{% if request.user.is_authenticated %}
+							<small class="title text-muted d-none d-md-block">Welcome, {{ request.user.first_name }} {{
+								request.user.last_name }}!</small>
 							<div class="d-flex align-items-center">
-								<a href="{% url 'wishlist' %}" hx-indicator="#progress" hx-boost="true" class="widget-header pl-3 ml-3">
-									<div class="icon icon-sm rounded-circle border">
-										<i class="fa fa-heart"></i>
-									</div>
+								<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
+									{% if request.user.profile.avatar and request.user.profile.avatar.url %}
+									<img src="{{ request.user.profile.avatar.url }}"
+										alt="Avatar of {{ request.user.first_name }}" class="rounded-circle" width="30"
+										height="30" />
+									{% else %}
+									<img src="{% static 'images/suman.jpg' %}" alt="Default avatar" class="rounded-circle"
+										width="30" height="30" />
+									{% endif %}
 								</a>
-								<a href="{% url 'cart' %}" hx-indicator="#progress" hx-boost="true" class="widget-header pl-3 ml-3">
-									<div class="icon icon-sm rounded-circle border">
-										<i class="fa fa-shopping-cart"></i>
-									</div>
-									<span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
-								</a>
+								<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true" class="ml-2">Profile</a>
 							</div>
-						</nav>
-					</div>
-					<!-- col.// --><!-- widgets-wrap.// -->
+							{% else %}
+							<small class="title text-muted d-none d-md-block">Welcome guest!</small>
+							<div>
+								<a hx-boost="true" hx-indicator="#progress" hx-swap="body" href="{% url 'login' %}">Sign
+									in</a>
+								<span class="dark-transp"> | </span>
+								<a hx-boost="true" hx-swap="body" href="{% url 'signup' %}"> Register</a>
+							</div>
+							{% endif %}
+						</section>
+						<div class="d-flex align-items-center ml-3">
+							<a href="{% url 'wishlist' %}" hx-indicator="#progress" hx-boost="true" class="widget-header">
+								<div class="icon icon-sm rounded-circle border">
+									<i class="fa fa-heart"></i>
+								</div>
+							</a>
+							<a href="{% url 'cart' %}" hx-indicator="#progress" hx-boost="true" class="widget-header ml-3">
+								<div class="icon icon-sm rounded-circle border">
+									<i class="fa fa-shopping-cart"></i>
+								</div>
+								<span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
+							</a>
+						</div>
+					</nav>
 				</div>
-				<!-- col.// -->
 			</div>
-			<!-- container.// -->
-		</section>
-		<!-- header-main .// -->
+		</div>
 	</header>
+
+
+
+
+
+
 	{% include "alerts.html" %}  {% block content %} {% endblock content %}
 
 	<!-- ========================= FOOTER ========================= -->
