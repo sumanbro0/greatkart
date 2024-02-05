@@ -64,7 +64,12 @@ class Product(models.Model):
         if  variant and variant.variant_stock is not None:
             variant.variant_stock -= quantity
             variant.save()
-        self.total_stock -= quantity
+        if self.total_stock == 0:
+            return
+        if self.total_stock == 1:
+            self.total_stock=0
+        else:
+            self.total_stock -= quantity
         self.save()
 
 class ProductVariant(models.Model):

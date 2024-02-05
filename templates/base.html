@@ -74,8 +74,7 @@
 					<nav class="d-flex justify-content-center align-items-center">
 						<section class="widget-header">
 							{% if request.user.is_authenticated %}
-							<small class="title text-muted d-none d-md-block">Welcome, {{ request.user.first_name }} {{
-								request.user.last_name }}!</small>
+							<small class="title text-muted d-none d-md-block">Welcome, {{ request.user.first_name }} {{	request.user.last_name }}!</small>
 							<div class="d-flex align-items-center">
 								<a href="{% url 'me' %}" hx-indicator="#progress" hx-boost="true">
 									{% if request.user.profile.avatar and request.user.profile.avatar.url %}

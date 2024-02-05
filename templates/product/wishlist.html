@@ -50,7 +50,7 @@
                     </h5>
                     <hr class="my-4">
                     <h6 class="card-subtitle mb-2 text-muted">Price</h6>
-                    <p class="card-text">${{ product.product.base_price }}</p>
+                    <p class="card-text">Rs. {{ product.product.base_price }}</p>
                     <div class="mt-auto">
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'product' product.product.id %}" hx-boost="true" class="btn btn-primary btn-md">View Details</a>
