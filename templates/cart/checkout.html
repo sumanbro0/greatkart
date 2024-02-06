@@ -20,7 +20,7 @@
 										{% if item.variant_product %}
 										<span class="text-muted"> {{item.quantity}}x {{item.variant_product.get_final_price }} = ${{item.total}} </span>
 										{% else %}
-										<span class="text-muted"> {{item.quantity}}x = $ {{item.product.get_final_price }} = ${{item.total}} </span>
+										<span class="text-muted"> {{item.quantity}}x = Rs. {{item.product.get_final_price }} = ${{item.total}} </span>
 										{% endif %}
 									</figcaption>
 								</figure>
