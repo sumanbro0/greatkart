@@ -120,4 +120,15 @@ class Review(models.Model):
     
 
 
+class Wishlist(models.Model):
+    user = models.ForeignKey('auth.User', related_name='wishlist', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    share_token = models.CharField(max_length=255, blank=True)
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.user.profile.full_name
+    
+
 
