@@ -103,7 +103,20 @@ class ProductImage(models.Model):
 
 
 
+class Review(models.Model):
+    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', related_name='reviews', on_delete=models.CASCADE)
+    comment = models.TextField(blank=True)
+    rating = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+        unique_together = ('product', 'user')
+
+    def __str__(self):
+        return self.product.name
     
 
 
