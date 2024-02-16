@@ -153,8 +153,6 @@ def checkout(request):
 
 @login_required
 def initiate_khalti_payment(request,cart,aid):
-    
-
     url = "https://a.khalti.com/api/v2/epayment/initiate/"
     return_url = request.build_absolute_uri(reverse("order_complete"))
     website_url = request.build_absolute_uri(reverse("home"))
@@ -175,9 +173,12 @@ def initiate_khalti_payment(request,cart,aid):
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-
-
-    return json.loads(response.text)
+    try:
+        res_json=json.loads(response.text)
+    except Exception as e:
+        print(e)
+        res_json={}
+    return res_json
 
 @login_required
 def place_order(request):
@@ -194,12 +195,16 @@ def place_order(request):
     
     address=Address.objects.get(id=address_id,profile__user=request.user)
     if payment_method=="pod":
-        o=cart.convert_to_order(address)
+        o=cart.convert_to_order(address,False)
         messages.success(request,"Order placed successfully.")
         return render(request,"cart/order_complete.html",{"order":o,"pod":True})
     
     if payment_method=="khalti":
         res=initiate_khalti_payment(request,cart,address_id)
+        if not res:
+            messages.error(request,"Khalti server error. Please try again.")
+            return redirect("checkout")
+        
         if res.get("pidx",None):
             return HttpResponse('<script>window.location.href="{}";</script>'.format(res['payment_url']))
         else:
